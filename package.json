@@ -6,7 +6,7 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "format": "npx prettier --write src/**/*.ts"
+    "format": "npx prettier --write . && eslint . --fix"
   },
   "author": "Susovan Dev <susovandas.dev@gmail.com>",
   "license": "ISC",
@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "mongoose": "^8.13.1"
   }
 }
