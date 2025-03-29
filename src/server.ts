@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 
 export class Server {
   app: express.Application;
@@ -6,14 +6,14 @@ export class Server {
     this.app = express();
   }
   start() {
-    this.middlewares()
+    this.middlewares();
     this.listen();
   }
 
   private middlewares() {
-    this.app.use(express.json({ limit: '15kb', strict: true }))
-    this.app.use(express.urlencoded({ extended: true, limit: '15kb' }))
-    this.app.use(express.static("public"))
+    this.app.use(express.json({ limit: '15kb', strict: true }));
+    this.app.use(express.urlencoded({ extended: true, limit: '15kb' }));
+    this.app.use(express.static('public'));
   }
   private listen() {
     this.app.listen(8080, () => {

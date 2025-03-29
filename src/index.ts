@@ -1,11 +1,11 @@
-import { Server } from "./server";
+import { Server } from './server';
 
 export class App {
-    run() {
-        const server = new Server()
-        server.start()
-    }
+  run() {
+    const server = new Server();
+    server.start();
+  }
 }
 
-const app = new App()
-app.run()
+const app = new App();
+app.run();
