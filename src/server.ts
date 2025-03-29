@@ -1,4 +1,5 @@
 import express from 'express';
+import { config } from './config/config';
 
 export class Server {
   app: express.Application;
@@ -16,8 +17,10 @@ export class Server {
     this.app.use(express.static('public'));
   }
   private listen() {
-    this.app.listen(8080, () => {
-      console.log(`Sever is running on port 8080`);
+    this.app.listen(config.port, () => {
+      console.log(
+        `Server running on port ${config.port} in ${config.environment} mode`,
+      );
     });
   }
 }
