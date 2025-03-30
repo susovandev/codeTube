@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { config } from './config';
 
-export const connectionDB = async () => {
+const connectionDB = async () => {
   try {
     await mongoose.connect(config.databaseUrl as string);
     console.log('Database connected');
@@ -10,3 +10,5 @@ export const connectionDB = async () => {
     console.log(`Database connection error: ${error}`);
   }
 };
+
+export { connectionDB };
