@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {Request, Response, NextFunction} from 'express';
 import { config } from './config/config';
 import { connectionDB } from './config/db';
 
@@ -10,6 +10,7 @@ export class Server {
   async start() {
     await this.databaseConnection();
     this.middlewares();
+    this.setupGlobalErrors();
     this.listen();
   }
 
@@ -24,6 +25,16 @@ export class Server {
     this.app.use(express.json({ limit: '15kb', strict: true }));
     this.app.use(express.urlencoded({ extended: true, limit: '15kb' }));
     this.app.use(express.static('public'));
+  }
+
+  private setupGlobalErrors() {
+    this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
+      res.status(404).json({
+        status: false,
+        message: `Can't find ${req.originalUrl} on this server!`,
+      });
+      next();
+    });
   }
   private listen() {
     this.app.listen(config.port, () => {
