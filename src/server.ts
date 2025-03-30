@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { config } from './config/config';
 import { connectionDB } from './config/db';
+import { StatusCodes } from 'http-status-codes';
 
 export class Server {
   app: express.Application;
@@ -29,7 +30,7 @@ export class Server {
 
   private setupGlobalErrors() {
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
-      res.status(404).json({
+      res.status(StatusCodes.NOT_FOUND).json({
         status: false,
         message: `Can't find ${req.originalUrl} on this server!`,
       });
