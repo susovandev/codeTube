@@ -10,7 +10,7 @@ export interface IUser extends Document {
   coverImage?: string;
   password: string;
   refreshToken?: string;
-  watchHistory: IVideo[];
+  watchHistory?: IVideo[];
   otp?: string;
   otpExpire?: Date;
   createdAt: Date;

@@ -5,26 +5,26 @@ const userSchema = new Schema<IUser>(
   {
     username: {
       type: String,
-      required: true,
+      required: [true, 'Username is required'],
       unique: true,
       trim: true,
       lowercase: true,
     },
     email: {
       type: String,
-      required: true,
+      required: [true, 'Email is required'],
       unique: true,
       trim: true,
       lowercase: true,
     },
     fullName: {
       type: String,
-      required: true,
+      required: [true, 'Full name is required'],
       trim: true,
     },
     avatar: {
       type: String,
-      required: true,
+      required: [true, 'Avatar is required'],
       trim: true,
     },
     coverImage: {
@@ -33,7 +33,7 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: true,
+      required: [true, 'Password is required'],
       trim: true,
     },
     refreshToken: {
@@ -44,7 +44,6 @@ const userSchema = new Schema<IUser>(
       {
         type: Schema.Types.ObjectId,
         ref: 'Video',
-        required: true,
       },
     ],
     otp: {
