@@ -1,9 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { config } from './config/config';
 import { connectionDB } from './config/db';
-import { StatusCodes } from 'http-status-codes';
 import { appRoutes } from './routes/appRoutes';
-import { CustomError, NotFoundException } from './utils/custom.error';
+import { NotFoundException } from './utils/custom.error';
+import { errorMiddleware } from './middleware/error.middleware';
 
 export class Server {
   app: express.Application;
@@ -41,24 +41,7 @@ export class Server {
       );
     });
 
-    this.app.use(
-      (err: any, req: Request, res: Response, next: NextFunction) => {
-        config.environment === 'development' && console.log(err);
-        if (err instanceof CustomError) {
-          res.status(err.statusCode).json({
-            status: false,
-            message: err.message,
-          });
-        }
-        if (err instanceof Error) {
-          res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-            status: false,
-            message: err.message,
-          });
-        }
-        next();
-      },
-    );
+    this.app.use(errorMiddleware);
   }
   private listen() {
     this.app.listen(config.port, () => {
