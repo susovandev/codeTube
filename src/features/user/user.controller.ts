@@ -4,6 +4,7 @@ import userServices from './user.services';
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError } from '../../utils/custom.error';
 import cloudinary from '../../utils/cloudinary';
+import { ApiResponse } from '../../utils/ApiTResponse';
 
 class UserController {
   async createUser(req: Request<{}, {}, IUser>, res: Response) {
@@ -40,11 +41,15 @@ class UserController {
       coverImage: coverImageData?.secure_url || '',
     });
 
-    res.status(StatusCodes.CREATED).json({
-      status: true,
-      message: 'User created successfully',
-      data: users,
-    });
+    res
+      .status(StatusCodes.CREATED)
+      .json(
+        new ApiResponse<IUser>(
+          StatusCodes.CREATED,
+          `Welcome ${users?.fullName}, Your account has been created successfully`,
+          users,
+        ),
+      );
   }
 }
 
