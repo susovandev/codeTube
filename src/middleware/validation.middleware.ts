@@ -1,17 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
 import { Schema } from 'joi';
-import { StatusCodes } from 'http-status-codes';
+import { BadRequestError } from '../utils/custom.error';
 
 export const validate = (schema: Schema) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const { error } = schema.validate(req.body);
+    const { error, value } = schema.validate(req.body, {
+      abortEarly: false,
+      stripUnknown: true,
+    });
+
     if (error) {
-      res.status(StatusCodes.BAD_REQUEST).json({
-        status: false,
-        message: 'Validation Errors',
-        error: error.details[0].message.replace(/"/g, ''),
-      });
+      const errorMessage = error.details
+        .map((detail) => detail.message.replace(/"/g, ''))
+        .join(', ');
+      return next(new BadRequestError(errorMessage));
     }
+
+    req.body = value;
     next();
   };
 };
