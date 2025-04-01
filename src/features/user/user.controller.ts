@@ -4,7 +4,7 @@ import userServices from './user.services';
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError } from '../../utils/custom.error';
 import cloudinary from '../../utils/cloudinary';
-import { ApiResponse } from '../../utils/ApiTResponse';
+import { ApiResponse } from '../../utils/ApiResponse';
 
 class UserController {
   async createUser(req: Request<{}, {}, IUser>, res: Response) {
