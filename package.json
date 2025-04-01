@@ -30,6 +30,7 @@
   "dependencies": {
     "@types/multer": "^1.4.12",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.6.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "http-status-codes": "^2.3.0",
