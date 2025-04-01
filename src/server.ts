@@ -4,6 +4,7 @@ import { connectionDB } from './config/db';
 import { appRoutes } from './routes/appRoutes';
 import { NotFoundException } from './utils/custom.error';
 import { errorMiddleware } from './middleware/error.middleware';
+import cookieParser from 'cookie-parser';
 
 export class Server {
   app: express.Application;
@@ -29,6 +30,7 @@ export class Server {
     this.app.use(express.json({ limit: '15kb', strict: true }));
     this.app.use(express.urlencoded({ extended: true, limit: '15kb' }));
     this.app.use(express.static('public'));
+    this.app.use(cookieParser());
   }
 
   private setupRoutes() {
