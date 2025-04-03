@@ -36,4 +36,9 @@ userRouter.post(
   asyncWrapper(userController.logout),
 );
 
+userRouter.post(
+  '/refresh-token',
+  asyncWrapper(userController.refreshAccessToken),
+);
+
 export default userRouter;
