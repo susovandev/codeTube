@@ -1,20 +1,20 @@
 import { UploadApiResponse } from 'cloudinary';
-import cloudinary, {
-  cloudinaryConfigForImages,
-} from '../config/cloudinaryConfig';
+import cloudinary from '../config/cloudinaryConfig';
 import { InternalServerError } from './custom.error';
 import fs from 'fs';
 
 class Cloudinary {
   async uploadImageOnCloud(
     localFilePath: string,
+    cloudinaryUploadFolderName: string,
   ): Promise<UploadApiResponse | null> {
     if (!localFilePath) return null;
     try {
-      const data = await cloudinary.uploader.upload(
-        localFilePath,
-        cloudinaryConfigForImages,
-      );
+      const data = await cloudinary.uploader.upload(localFilePath, {
+        folder: `images/${cloudinaryUploadFolderName}`,
+        resource_type: 'image',
+        transformation: [{ width: 200, height: 200, crop: 'limit' }],
+      });
       fs.unlinkSync(localFilePath);
       return data;
     } catch (error) {

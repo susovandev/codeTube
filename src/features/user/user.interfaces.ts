@@ -15,4 +15,6 @@ export interface IUser extends Document {
   otpExpire?: Date;
   createdAt: Date;
   updatedAt: Date;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
 }

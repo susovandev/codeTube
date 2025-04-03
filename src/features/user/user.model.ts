@@ -1,7 +1,10 @@
 import { Schema, model } from 'mongoose';
 import { IUser } from './user.interfaces';
+import { config } from '../../config/config';
 import bcrypt from 'bcryptjs';
-const userSchema = new Schema<IUser>(
+import jwt from 'jsonwebtoken';
+
+const userSchema: Schema<IUser> = new Schema(
   {
     username: {
       type: String,
@@ -64,4 +67,23 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.methods.isPasswordCorrect = async function (password: string) {
+  return await bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    { _id: this._id, username: this.username, fullName: this.fullNam },
+    config.accessTokenSecret as string,
+    {
+      expiresIn: 60 * 60 * 24,
+    },
+  );
+};
+
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign({ _id: this._id }, config.refreshTokenSecret as string, {
+    expiresIn: 60 * 60 * 24 * 7,
+  });
+};
 export const User = model<IUser>('User', userSchema);
