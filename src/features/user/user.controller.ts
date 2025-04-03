@@ -2,12 +2,17 @@ import { Request, Response } from 'express';
 import { ILoginCredentials, IUser } from './user.interfaces';
 import userServices from './user.services';
 import { StatusCodes } from 'http-status-codes';
-import { BadRequestError, InternalServerError } from '../../utils/custom.error';
+import {
+  BadRequestError,
+  InternalServerError,
+  UnAuthorizedException,
+} from '../../utils/custom.error';
 import cloudinary from '../../utils/cloudinary';
 import { ApiResponse } from '../../utils/ApiResponse';
 import fs from 'fs';
 import { User } from './user.model';
 import { generateAccessTokenAndRefreshToken } from '../../utils/generateToken';
+import { CustomRequest } from '../../middleware/auth.middleware';
 
 class UserController {
   async createUser(req: Request<{}, {}, IUser>, res: Response) {
@@ -100,7 +105,7 @@ class UserController {
     // Check User Existence
     let user;
     user = await userServices.checkUserExits(email, username);
-    console.log(user);
+
     if (!user) {
       throw new BadRequestError('User not found');
     }
@@ -134,6 +139,34 @@ class UserController {
           user,
         ),
       );
+  }
+
+  async logout(req: CustomRequest, res: Response) {
+    if (!req.user || !req.user._id) {
+      throw new UnAuthorizedException('User not found or not authenticated');
+    }
+
+    // Update refreshToken in DB
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { refreshToken: '' },
+      { new: true },
+    );
+
+    // Clear cookies properly
+    res
+      .status(StatusCodes.OK)
+      .clearCookie('accessToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      })
+      .clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      })
+      .json(new ApiResponse(StatusCodes.OK, 'User logged out successfully'));
   }
 }
 
