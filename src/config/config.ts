@@ -5,6 +5,7 @@ const _config = {
   environment: process.env.NODE_ENV || 'development',
   port: Number(process.env.PORT) || 3000,
   databaseUrl: process.env.DATABASE_URL,
+  clientUrl: process.env.CLIENT_URL,
   cloudinary: {
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,

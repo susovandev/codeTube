@@ -5,6 +5,7 @@ import { appRoutes } from './routes/appRoutes';
 import { NotFoundException } from './utils/custom.error';
 import { errorMiddleware } from './middleware/error.middleware';
 import cookieParser from 'cookie-parser';
+import { corsConfig } from './config/corsConfig';
 
 export class Server {
   app: express.Application;
@@ -27,6 +28,7 @@ export class Server {
     }
   }
   private middlewares() {
+    this.app.use(corsConfig);
     this.app.use(express.json({ limit: '15kb', strict: true }));
     this.app.use(express.urlencoded({ extended: true, limit: '15kb' }));
     this.app.use(express.static('public'));
