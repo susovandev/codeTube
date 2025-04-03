@@ -17,4 +17,11 @@ export interface IUser extends Document {
   updatedAt: Date;
   generateAccessToken(): string;
   generateRefreshToken(): string;
+  isPasswordCorrect(enteredPassword: string): Promise<boolean>;
+}
+
+export interface ILoginCredentials {
+  username: string;
+  email: string;
+  password: string;
 }

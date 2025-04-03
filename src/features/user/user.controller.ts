@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { IUser } from './user.interfaces';
+import { ILoginCredentials, IUser } from './user.interfaces';
 import userServices from './user.services';
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError, InternalServerError } from '../../utils/custom.error';
@@ -93,6 +93,47 @@ class UserController {
       }
       throw error;
     }
+  }
+
+  async loginUser(req: Request<{}, {}, ILoginCredentials>, res: Response) {
+    const { username, email, password } = req.body;
+    // Check User Existence
+    let user;
+    user = await userServices.checkUserExits(email, username);
+    console.log(user);
+    if (!user) {
+      throw new BadRequestError('User not found');
+    }
+    // Check Password
+    const isPasswordCorrect = await user.isPasswordCorrect(password);
+    if (!isPasswordCorrect) {
+      throw new BadRequestError('Password is incorrect');
+    }
+    // Generate Token
+    const { accessToken, refreshToken } =
+      await generateAccessTokenAndRefreshToken(user._id);
+
+    user = await User.findById(user._id).select('-password -refreshToken');
+    // Set Cookies Securely & Send Response
+    res
+      .status(StatusCodes.OK)
+      .cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      })
+      .cookie('accessToken', accessToken, {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      })
+      .json(
+        new ApiResponse<IUser | null>(
+          StatusCodes.OK,
+          `Welcome ${user?.fullName}`,
+          user,
+        ),
+      );
   }
 }
 
