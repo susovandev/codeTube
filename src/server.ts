@@ -7,6 +7,10 @@ import { errorMiddleware } from './middleware/error.middleware';
 import cookieParser from 'cookie-parser';
 import { corsConfig } from './config/corsConfig';
 import { limiter } from './config/limiterConfig';
+import helmet from 'helmet';
+import hpp from 'hpp';
+import compression from 'compression';
+import mongoSanitize from 'express-mongo-sanitize';
 
 export class Server {
   app: express.Application;
@@ -29,11 +33,20 @@ export class Server {
     }
   }
   private middlewares() {
+    // Security Middlewares
+    this.app.use(helmet());
+    this.app.use(hpp());
+    this.app.use(mongoSanitize());
     this.app.use(corsConfig);
+
+    // Performance Enhancements
+    this.app.use(compression());
     this.app.use('/api', limiter);
+
+    // Standard Middleware
+    this.app.use(express.static('public'));
     this.app.use(express.json({ limit: '15kb', strict: true }));
     this.app.use(express.urlencoded({ extended: true, limit: '15kb' }));
-    this.app.use(express.static('public'));
     this.app.use(cookieParser());
   }
 
