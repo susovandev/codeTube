@@ -15,6 +15,14 @@ export const errorMiddleware = (
       message: err.message,
     });
   }
+
+  if (err instanceof SyntaxError) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      status: false,
+      message: 'Invalid JSON format',
+    });
+  }
+
   if (err instanceof Error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       status: false,

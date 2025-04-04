@@ -3,7 +3,11 @@ import userController from './user.controller';
 import { asyncWrapper } from '../../utils/asyncWrapper';
 import { upload } from '../../middleware/multer.middleware';
 import { validate } from '../../middleware/validation.middleware';
-import { createUserSchema, userLoginSchema } from './user.validation';
+import {
+  createUserSchema,
+  updateUserSchema,
+  userLoginSchema,
+} from './user.validation';
 import { authMiddleware } from '../../middleware/auth.middleware';
 
 const userRouter = Router();
@@ -45,6 +49,13 @@ userRouter.get(
   '/profile',
   asyncWrapper(authMiddleware),
   asyncWrapper(userController.getCurrentUserProfile),
+);
+
+userRouter.put(
+  '/profile-update',
+  validate(updateUserSchema),
+  asyncWrapper(authMiddleware),
+  asyncWrapper(userController.updateUserProfile),
 );
 
 export default userRouter;

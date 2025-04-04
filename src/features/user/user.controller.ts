@@ -244,13 +244,53 @@ class UserController {
     }
   }
   async getCurrentUserProfile(req: CustomRequest, res: Response) {
+    // Fetch User
     const user = await userServices.findUserById(req.user?._id);
     if (!user) {
       throw new ForbiddenException('User not found');
     }
+
+    // Send Response
     res
       .status(StatusCodes.OK)
       .json(new ApiResponse(StatusCodes.OK, 'User fetched successfully', user));
+  }
+
+  async updateUserProfile(req: CustomRequest, res: Response) {
+    const { _id } = req.user!;
+    // Extract User Data
+    const { username, email, fullName } = req.body;
+
+    // Check if User Already Exists with the provided details
+    const existingUser = await User.findOne({
+      $or: [{ username }, { email }, { fullName }],
+    });
+    if (existingUser) {
+      throw new BadRequestError(
+        'User already exists with the provided details',
+      );
+    }
+
+    // Update User
+    const updatedUser = await userServices.updateUser(_id, {
+      username: username ? username : req.user?.username,
+      email: email ? email.toLowerCase() : req.user?.email,
+      fullName: fullName ? fullName : req.user?.fullName,
+    });
+    if (!updatedUser) {
+      throw new ForbiddenException('User not found');
+    }
+
+    // Send Response
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          'User updated successfully',
+          updatedUser,
+        ),
+      );
   }
 }
 

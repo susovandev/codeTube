@@ -25,9 +25,13 @@ class UserServices {
     _id: Types.ObjectId,
     data: Partial<IUser>,
   ): Promise<IUser | null> {
-    return await User.findOneAndUpdate({ _id }, data, { new: true }).select(
-      '-password -refreshToken',
-    );
+    return await User.findOneAndUpdate(
+      { _id },
+      {
+        $set: data,
+      },
+      { new: true },
+    ).select('-password -refreshToken');
   }
 }
 
