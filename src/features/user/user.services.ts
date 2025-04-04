@@ -3,7 +3,10 @@ import { IUser } from './user.interfaces';
 import { User } from './user.model';
 
 class UserServices {
-  async checkUserExits(email: string, username: string): Promise<IUser | null> {
+  async checkUserExists(
+    email: string,
+    username: string,
+  ): Promise<IUser | null> {
     const user = await User.findOne({
       $and: [{ email }, { username }],
     });
@@ -14,8 +17,17 @@ class UserServices {
     return users;
   }
 
-  async findUerById(_id: Types.ObjectId): Promise<IUser | null> {
-    return await User.findById(_id);
+  async findUserById(_id: Types.ObjectId): Promise<IUser | null> {
+    return await User.findById(_id).select('-password -refreshToken');
+  }
+
+  async updateUser(
+    _id: Types.ObjectId,
+    data: Partial<IUser>,
+  ): Promise<IUser | null> {
+    return await User.findOneAndUpdate({ _id }, data, { new: true }).select(
+      '-password -refreshToken',
+    );
   }
 }
 

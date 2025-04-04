@@ -41,4 +41,10 @@ userRouter.post(
   asyncWrapper(userController.refreshAccessToken),
 );
 
+userRouter.get(
+  '/profile',
+  asyncWrapper(authMiddleware),
+  asyncWrapper(userController.getCurrentUserProfile),
+);
+
 export default userRouter;

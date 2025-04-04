@@ -30,7 +30,7 @@ class UserController {
 
     try {
       // Check if User Already Exists
-      const ifUserExists = await userServices.checkUserExits(email, username);
+      const ifUserExists = await userServices.checkUserExists(email, username);
       if (ifUserExists) {
         throw new BadRequestError('User already exists');
       }
@@ -70,9 +70,7 @@ class UserController {
         await generateAccessTokenAndRefreshToken(users._id);
 
       // Fetch User Without Sensitive Data
-      const newUser = await User.findById(users._id).select(
-        '-password -refreshToken',
-      );
+      const newUser = await userServices.findUserById(users._id);
       if (!newUser) {
         throw new InternalServerError('Error creating user');
       }
@@ -113,7 +111,7 @@ class UserController {
 
     // Check User Existence
     let user;
-    user = await userServices.checkUserExits(email, username);
+    user = await userServices.checkUserExists(email, username);
     if (!user) {
       throw new BadRequestError(
         'User not found. Please check your credentials.',
@@ -131,9 +129,7 @@ class UserController {
       await generateAccessTokenAndRefreshToken(user._id);
 
     // Fetch User Without Sensitive Data
-    const sanitizedUser = await User.findById(user._id).select(
-      '-password -refreshToken',
-    );
+    const sanitizedUser = await userServices.findUserById(user._id);
 
     // Set Cookies Securely & Send Response
     res
@@ -163,11 +159,7 @@ class UserController {
     }
 
     // Update refreshToken in DB
-    await User.findByIdAndUpdate(
-      req.user._id,
-      { refreshToken: '' },
-      { new: true },
-    );
+    await userServices.updateUser(req.user._id, { refreshToken: '' });
 
     // Clear cookies properly
     res
@@ -250,6 +242,15 @@ class UserController {
         'Invalid or expired refresh token. Please login again.',
       );
     }
+  }
+  async getCurrentUserProfile(req: CustomRequest, res: Response) {
+    const user = await userServices.findUserById(req.user?._id);
+    if (!user) {
+      throw new ForbiddenException('User not found');
+    }
+    res
+      .status(StatusCodes.OK)
+      .json(new ApiResponse(StatusCodes.OK, 'User fetched successfully', user));
   }
 }
 
