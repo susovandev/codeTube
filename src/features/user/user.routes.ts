@@ -28,4 +28,11 @@ userRouter.put(
   asyncWrapper(userController.updateUserAvatar),
 );
 
+userRouter.put(
+  '/profile/cover-image',
+  asyncWrapper(authMiddleware),
+  upload.single('coverImage'),
+  asyncWrapper(userController.updateUserCoverImage),
+);
+
 export default userRouter;

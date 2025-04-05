@@ -40,11 +40,10 @@ const userSchema: Schema<IUser> = new Schema(
       public_id: {
         type: String,
         trim: true,
-        required: [true, 'Public ID is required'],
       },
       secure_url: {
         type: String,
-        trim: [true, 'Secure URL is required'],
+        trim: true,
       },
     },
     password: {

@@ -25,6 +25,13 @@ const fileFilter = (
 ) => {
   const allowedMimeTypes = [
     'image/jpeg',
+    'image/jpg',
+    'image/webp',
+    'image/bmp',
+    'image/svg+xml',
+    'image/tiff',
+    'image/avif',
+    'image/heic',
     'image/png',
     'image/gif',
     'video/mp4',

@@ -35,16 +35,16 @@ class AuthController {
     const avatarLocalFilePath = avatar?.[0]?.path as string;
     const coverImageLocalFilePath = coverImage?.[0]?.path as string;
 
+    // Validate that avatar is present
+    if (!avatarLocalFilePath) {
+      throw new BadRequestError('Please upload an avatar image.');
+    }
+
     try {
       // Check if user already exists
       const ifUserExists = await userServices.checkUserExists(email, username);
       if (ifUserExists) {
         throw new BadRequestError('User already exists');
-      }
-
-      // Validate that avatar is present
-      if (!avatarLocalFilePath) {
-        throw new BadRequestError('Avatar is required');
       }
 
       // Upload avatar image to Cloudinary

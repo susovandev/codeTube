@@ -6,7 +6,7 @@ import { ApiResponse } from '../../utils/ApiResponse';
 import { User } from './user.model';
 import { CustomRequest } from '../../middleware/auth.middleware';
 import Cloudinary from '../../utils/cloudinary';
-import { IUser } from './user.interfaces';
+import { IImageInfo } from './user.interfaces';
 
 class UserController {
   /**
@@ -65,15 +65,13 @@ class UserController {
     }
 
     // Send success response
-    res
-      .status(StatusCodes.OK)
-      .json(
-        new ApiResponse(
-          StatusCodes.OK,
-          'User updated successfully',
-          updatedUser,
-        ),
-      );
+    res.status(StatusCodes.OK).json(
+      new ApiResponse(StatusCodes.OK, 'User updated successfully', {
+        username: updatedUser?.username,
+        email: updatedUser?.email,
+        fullName: updatedUser?.fullName,
+      }),
+    );
   }
 
   /**
@@ -130,15 +128,87 @@ class UserController {
     }
 
     // Send success response
-    res
-      .status(StatusCodes.OK)
-      .json(
-        new ApiResponse<IUser | null>(
-          StatusCodes.OK,
-          'Avatar updated successfully',
-          updatedUser,
-        ),
+    res.status(StatusCodes.OK).json(
+      new ApiResponse<{ avatar: IImageInfo }>(
+        StatusCodes.OK,
+        'Avatar updated successfully',
+        {
+          avatar: {
+            secure_url: avatarData?.secure_url,
+            public_id: avatarData?.public_id,
+          },
+        },
+      ),
+    );
+  }
+
+  /**
+   * @desc    Update User Cover Image
+   * @route   PUT /api/user/profile/cover-image
+   * @access  Private
+   */
+
+  async updateUserCoverImage(req: CustomRequest, res: Response) {
+    const { _id } = req.user!;
+
+    // Extract Cover image from the request
+    const coverImageLocalFilePath = req.file?.path;
+
+    if (!coverImageLocalFilePath) {
+      throw new BadRequestError('Please upload an cover image.');
+    }
+
+    // Upload Cover image to Cloudinary
+    const coverImageData = await Cloudinary.uploadImageOnCloud(
+      coverImageLocalFilePath,
+      'coverImages',
+    );
+
+    // If upload fails, throw an error
+    if (!coverImageLocalFilePath) {
+      throw new BadRequestError(
+        'Failed to upload cover image. Please try again.',
       );
+    }
+
+    // Fetch the user details from the database
+    const user = await User.findById(_id);
+
+    if (!user) {
+      throw new ForbiddenException('User does not exist or is unauthorized.');
+    }
+
+    // Delete previous avatar
+    if (user?.coverImage?.public_id) {
+      await Cloudinary.deleteImageOnCloud(user?.coverImage?.public_id);
+    }
+
+    // Update user cover image
+    const updatedUser = await userServices.updateUser(_id, {
+      coverImage: {
+        secure_url: coverImageData?.secure_url!,
+        public_id: coverImageData?.public_id!,
+      },
+    });
+
+    // If update fails, throw an error
+    if (!updatedUser) {
+      throw new ForbiddenException(
+        'Unable to update cover image. Please try again.',
+      );
+    }
+
+    // Send success response
+    res.status(StatusCodes.OK).json(
+      new ApiResponse<{
+        coverImage: IImageInfo;
+      }>(StatusCodes.OK, 'Cover Image updated successfully', {
+        coverImage: {
+          public_id: coverImageData?.public_id!,
+          secure_url: coverImageData?.secure_url!,
+        },
+      }),
+    );
   }
 }
 
