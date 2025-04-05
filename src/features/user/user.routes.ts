@@ -2,7 +2,11 @@ import { Router } from 'express';
 import userController from './user.controller';
 import { asyncWrapper } from '../../utils/asyncWrapper';
 import { validate } from '../../middleware/validation.middleware';
-import { updateUserSchema } from './user.validation';
+import {
+  forgetPasswordSchema,
+  updatePasswordSchema,
+  updateUserSchema,
+} from './user.validation';
 import { authMiddleware } from '../../middleware/auth.middleware';
 import { upload } from '../../middleware/multer.middleware';
 
@@ -37,6 +41,13 @@ userRouter.put(
 
 userRouter.post(
   '/profile/forget-password',
+  validate(forgetPasswordSchema),
   asyncWrapper(userController.forgetPassword),
+);
+
+userRouter.post(
+  '/profile/reset-password/:resetToken',
+  validate(updatePasswordSchema),
+  asyncWrapper(userController.resetPassword),
 );
 export default userRouter;

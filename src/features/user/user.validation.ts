@@ -90,3 +90,33 @@ export const updateUserSchema = Joi.object({
     'string.max': 'Full name cannot exceed 50 characters',
   }),
 }).or('username', 'email', 'fullName');
+
+export const forgetPasswordSchema = Joi.object({
+  email: Joi.string()
+    .email()
+    .pattern(new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'))
+    .messages({
+      'string.empty': 'Email is required',
+      'string.email': 'Invalid email format',
+    })
+    .required(),
+});
+
+export const updatePasswordSchema = Joi.object({
+  password: Joi.string()
+    .min(6)
+    .max(30)
+    .pattern(
+      new RegExp(
+        '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$',
+      ),
+    )
+    .messages({
+      'string.empty': 'Password is required',
+      'string.min': 'Password must be at least 6 characters long',
+      'string.max': 'Password cannot exceed 30 characters',
+      'string.pattern.base':
+        'Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character',
+    })
+    .required(),
+});

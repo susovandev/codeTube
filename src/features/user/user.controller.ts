@@ -9,6 +9,7 @@ import Cloudinary from '../../utils/cloudinary';
 import { IImageInfo } from './user.interfaces';
 import { sendResetPasswordEmail } from '../../utils/sendMail';
 import { config } from '../../config/config';
+import crypto from 'crypto';
 
 class UserController {
   /**
@@ -215,27 +216,36 @@ class UserController {
 
   /**
    * @desc    Update User forget password
-   * @route   PUT /api/user/profile/forget-password
-   * @access  Private
+   * @route   POST /api/user/profile/forget-password
+   * @access  Public
    */
   async forgetPassword(req: Request, res: Response) {
     // Extract email from the request
     const { email } = req.body;
 
+    // If email is not provided, throw an error
     if (!email) {
-      throw new BadRequestError('Email is required');
+      throw new BadRequestError(
+        'Please provide your email address to reset your password.',
+      );
     }
 
     // Fetch the user details from the database
     const user = await User.findOne({ email });
 
+    // If user not found, throw an error
     if (!user) {
-      throw new BadRequestError('User not found');
+      throw new BadRequestError(
+        'No user found with the provided email address.',
+      );
     }
 
     // Generate reset password token
     const resetToken = await user.getResetToken();
 
+    await user.save();
+
+    // Generate password reset email format
     const message = `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
     <h2 style="color: #333;">🔐 Password Reset Request</h2>
@@ -280,15 +290,77 @@ class UserController {
 `;
 
     // Send Token to user email
-    await sendResetPasswordEmail(user?.email, 'Reset Password Token', message);
+    await sendResetPasswordEmail(
+      user?.email,
+      '🔐 Reset Your Password - CodeTube',
+      message,
+    );
 
     // Send success response
     res
       .status(StatusCodes.OK)
       .json(
-        new ApiResponse<{ resetToken: string }>(
+        new ApiResponse(
           StatusCodes.OK,
-          'Reset password token sent successfully',
+          'Password reset email sent successfully. Please check your inbox (or spam folder).',
+        ),
+      );
+  }
+
+  /**
+   * @desc    Update User reset password
+   * @route   POST /api/user/profile/reset-password/:resetToken
+   * @access  Public
+   */
+
+  async resetPassword(
+    req: Request<{ resetToken: string }, {}, { password: string }>,
+    res: Response,
+  ) {
+    // Extract reset token from the request
+    const { resetToken } = req.params;
+    const { password } = req.body;
+
+    if (!resetToken) {
+      throw new BadRequestError('Reset token is missing in the request');
+    }
+
+    if (!password) {
+      throw new BadRequestError('New password must be provided');
+    }
+
+    // Validate reset token
+    const resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
+
+    // Fetch the user details from the database based on the reset token
+    const user = await User.findOne({
+      otp: resetPasswordToken,
+      otpExpire: { $gt: Date.now() },
+    });
+
+    // If user not found, throw an exception
+    if (!user) {
+      throw new BadRequestError(
+        'This password reset link is invalid or has expired. Please request a new one.',
+      );
+    }
+
+    // Update user password
+    user.password = password;
+    user.otp = undefined;
+    user.otpExpire = undefined;
+    await user.save();
+
+    // Send success response
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          'Your password has been successfully reset! You can now log in with your new password.',
         ),
       );
   }
