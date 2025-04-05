@@ -7,6 +7,8 @@ import { User } from './user.model';
 import { CustomRequest } from '../../middleware/auth.middleware';
 import Cloudinary from '../../utils/cloudinary';
 import { IImageInfo } from './user.interfaces';
+import { sendResetPasswordEmail } from '../../utils/sendMail';
+import { config } from '../../config/config';
 
 class UserController {
   /**
@@ -209,6 +211,86 @@ class UserController {
         },
       }),
     );
+  }
+
+  /**
+   * @desc    Update User forget password
+   * @route   PUT /api/user/profile/forget-password
+   * @access  Private
+   */
+  async forgetPassword(req: Request, res: Response) {
+    // Extract email from the request
+    const { email } = req.body;
+
+    if (!email) {
+      throw new BadRequestError('Email is required');
+    }
+
+    // Fetch the user details from the database
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new BadRequestError('User not found');
+    }
+
+    // Generate reset password token
+    const resetToken = await user.getResetToken();
+
+    const message = `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+    <h2 style="color: #333;">🔐 Password Reset Request</h2>
+
+    <p>Hi ${user?.fullName || user?.username},</p>
+
+    <p>We noticed you requested to reset your password on <strong>CodeTube</strong>. No worries — it happens to the best of us! 🙌</p>
+
+    <p>To securely reset your password, please click the button below:</p>
+
+    <a href="${config.clientUrl}/reset-password/${resetToken}" 
+       style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+      🔄 Reset My Password
+    </a>
+
+    <p style="margin-top: 20px;">Or you can copy and paste this link into your browser:</p>
+    <p style="word-break: break-word;">
+      <a href="${config.clientUrl}/reset-password/${resetToken}">${config.clientUrl}/reset-password/${resetToken}</a>
+    </p>
+
+    <hr style="margin: 30px 0;">
+
+    <h4 style="color: #444;">⏳ This link will expire in 15 minutes</h4>
+    <p>For your security, the link above is valid for only a short time. If it expires, you'll need to request a new password reset.</p>
+
+    <p>If you didn’t make this request, you can safely ignore this email. Rest assured your account is still secure with us.</p>
+
+    <hr style="margin: 30px 0;">
+
+    <h4 style="color: #444;">💡 Pro Tip</h4>
+    <p>Once you've reset your password, we recommend logging in and reviewing your account settings to make sure everything looks good.</p>
+
+    <p>And while you're at it... why not explore some of the latest features we’ve rolled out in <strong>CodeTube</strong>? We’re constantly improving to serve you better. 🚀</p>
+
+    <p style="margin-top: 40px;">Stay safe,<br/><strong>The CodeTube Team</strong></p>
+
+    <hr style="margin: 30px 0;">
+    <p style="font-size: 12px; color: #999;">
+      Need help or have questions? <a href="mailto:support@yourapp.com">Contact our support team</a> or just reply to this email.
+    </p>
+  </div>
+`;
+
+    // Send Token to user email
+    await sendResetPasswordEmail(user?.email, 'Reset Password Token', message);
+
+    // Send success response
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse<{ resetToken: string }>(
+          StatusCodes.OK,
+          'Reset password token sent successfully',
+        ),
+      );
   }
 }
 

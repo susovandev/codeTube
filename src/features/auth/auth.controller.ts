@@ -44,7 +44,9 @@ class AuthController {
       // Check if user already exists
       const ifUserExists = await userServices.checkUserExists(email, username);
       if (ifUserExists) {
-        throw new BadRequestError('User already exists');
+        throw new BadRequestError(
+          'User already exists with the provided details',
+        );
       }
 
       // Upload avatar image to Cloudinary

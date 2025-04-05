@@ -13,6 +13,8 @@ const _config = {
   },
   accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
   refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
+  userEmail: process.env.EMAIL,
+  userEmailPassword: process.env.EMAIL_PASSWORD,
 };
 
 export const config = Object.freeze(_config);

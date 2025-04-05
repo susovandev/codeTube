@@ -11,7 +11,7 @@ class UserServices {
     username: string,
   ): Promise<IUser | null> {
     return await User.findOne({
-      $and: [{ email }, { username }],
+      $or: [{ email }, { username }],
     });
   }
 

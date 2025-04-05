@@ -22,6 +22,7 @@ export interface IUser extends Document {
   generateAccessToken(): string;
   generateRefreshToken(): string;
   isPasswordCorrect(enteredPassword: string): Promise<boolean>;
+  getResetToken(): string;
 }
 
 export interface ILoginCredentials {

@@ -3,6 +3,7 @@ import { IUser } from './user.interfaces';
 import { config } from '../../config/config';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const userSchema: Schema<IUser> = new Schema(
   {
@@ -99,5 +100,14 @@ userSchema.methods.generateRefreshToken = function () {
   return jwt.sign({ _id: this._id }, config.refreshTokenSecret as string, {
     expiresIn: 60 * 60 * 24 * 7,
   });
+};
+
+userSchema.methods.getResetToken = function () {
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  this.otp = crypto.createHash('sha256').update(resetToken).digest('hex');
+  this.otpExpire = Date.now() + 15 * 60 * 1000;
+
+  return resetToken;
 };
 export const User = model<IUser>('User', userSchema);

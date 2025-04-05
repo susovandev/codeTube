@@ -35,4 +35,8 @@ userRouter.put(
   asyncWrapper(userController.updateUserCoverImage),
 );
 
+userRouter.post(
+  '/profile/forget-password',
+  asyncWrapper(userController.forgetPassword),
+);
 export default userRouter;
