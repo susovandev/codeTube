@@ -1,13 +1,17 @@
 import { Document, Types } from 'mongoose';
 import { IVideo } from '../video/video.interfaces';
 
+export interface IImageInfo {
+  public_id: string;
+  secure_url: string;
+}
 export interface IUser extends Document {
   _id: Types.ObjectId;
   username: string;
   email: string;
   fullName: string;
-  avatar: string;
-  coverImage?: string;
+  avatar: IImageInfo;
+  coverImage?: IImageInfo;
   password: string;
   refreshToken?: string;
   watchHistory?: IVideo[];

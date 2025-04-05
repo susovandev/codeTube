@@ -5,6 +5,8 @@ import { BadRequestError, ForbiddenException } from '../../utils/custom.error';
 import { ApiResponse } from '../../utils/ApiResponse';
 import { User } from './user.model';
 import { CustomRequest } from '../../middleware/auth.middleware';
+import Cloudinary from '../../utils/cloudinary';
+import { IUser } from './user.interfaces';
 
 class UserController {
   /**
@@ -29,7 +31,7 @@ class UserController {
 
   /**
    * @desc    Update User Profile
-   * @route   PUT /api/user/profile
+   * @route   PUT /api/user/profile-update
    * @access  Private
    */
   async updateUserProfile(req: CustomRequest, res: Response) {
@@ -69,6 +71,71 @@ class UserController {
         new ApiResponse(
           StatusCodes.OK,
           'User updated successfully',
+          updatedUser,
+        ),
+      );
+  }
+
+  /**
+   * @desc    Update User Avatar
+   * @route   PUT /api/user/profile/avatar
+   * @access  Private
+   */
+
+  async updateUserAvatar(req: CustomRequest, res: Response) {
+    const { _id } = req.user!;
+
+    // Extract avatar image from the request
+    const avatarLocalFilePath = req.file?.path;
+
+    if (!avatarLocalFilePath) {
+      throw new BadRequestError('Please upload an avatar image.');
+    }
+
+    // Upload avatar image to Cloudinary
+    const avatarData = await Cloudinary.uploadImageOnCloud(
+      avatarLocalFilePath,
+      'avatars',
+    );
+
+    // If upload fails, throw an error
+    if (!avatarData) {
+      throw new BadRequestError('Failed to upload avatar. Please try again.');
+    }
+
+    // Fetch the user details from the database
+    const user = await User.findById(_id);
+
+    if (!user) {
+      throw new ForbiddenException('User does not exist or is unauthorized.');
+    }
+    // Delete previous avatar
+    if (user?.avatar?.public_id) {
+      await Cloudinary.deleteImageOnCloud(user?.avatar?.public_id);
+    }
+
+    // Update user avatar
+    const updatedUser = await userServices.updateUser(_id, {
+      avatar: {
+        secure_url: avatarData?.secure_url,
+        public_id: avatarData?.public_id,
+      },
+    });
+
+    // If update fails, throw an error
+    if (!updatedUser) {
+      throw new ForbiddenException(
+        'Unable to update avatar. Please try again.',
+      );
+    }
+
+    // Send success response
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse<IUser | null>(
+          StatusCodes.OK,
+          'Avatar updated successfully',
           updatedUser,
         ),
       );

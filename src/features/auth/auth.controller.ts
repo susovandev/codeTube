@@ -68,8 +68,14 @@ class AuthController {
         email: email.toLowerCase(),
         fullName,
         password,
-        avatar: avatarData?.secure_url,
-        coverImage: coverImageData?.secure_url || '',
+        avatar: {
+          public_id: avatarData?.public_id!,
+          secure_url: avatarData?.secure_url!,
+        },
+        coverImage: {
+          public_id: coverImageData?.public_id || '',
+          secure_url: coverImageData?.secure_url || '',
+        },
       });
 
       // Generate access and refresh tokens

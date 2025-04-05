@@ -26,13 +26,26 @@ const userSchema: Schema<IUser> = new Schema(
       trim: true,
     },
     avatar: {
-      type: String,
-      required: [true, 'Avatar is required'],
-      trim: true,
+      public_id: {
+        type: String,
+        trim: true,
+        required: [true, 'Public ID is required'],
+      },
+      secure_url: {
+        type: String,
+        trim: [true, 'Secure URL is required'],
+      },
     },
     coverImage: {
-      type: String,
-      trim: true,
+      public_id: {
+        type: String,
+        trim: true,
+        required: [true, 'Public ID is required'],
+      },
+      secure_url: {
+        type: String,
+        trim: [true, 'Secure URL is required'],
+      },
     },
     password: {
       type: String,
