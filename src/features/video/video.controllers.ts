@@ -2,10 +2,10 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError } from '../../utils/custom.error';
 import Cloudinary from '../../utils/cloudinary';
-import { Video } from './video.model';
 import { CustomRequest } from '../../middleware/auth.middleware';
 import { ApiResponse } from '../../utils/ApiResponse';
 import fs from 'fs';
+import videoServices from './video.services';
 
 class VideoController {
   /**
@@ -48,7 +48,7 @@ class VideoController {
       }
 
       // Create video
-      const videoInfo = await Video.create({
+      const videoInfo = await videoServices.createVideo({
         videoFile: {
           public_id: videoData?.public_id,
           secure_url: videoData?.secure_url,

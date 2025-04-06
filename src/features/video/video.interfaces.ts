@@ -1,9 +1,10 @@
 import { IImageInfo, IUser } from '../user/user.interfaces';
+import { Types } from 'mongoose';
 
 export interface IVideo {
   _id: string;
   videoFile: IImageInfo;
-  owner: IUser;
+  owner: Types.ObjectId | IUser;
   thumbnail: IImageInfo;
   title: string;
   description: string;
