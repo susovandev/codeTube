@@ -4,9 +4,16 @@ import { IVideo } from './video.interfaces';
 const videoSchema = new Schema<IVideo>(
   {
     videoFile: {
-      type: String,
-      required: true,
-      trim: true,
+      public_id: {
+        type: String,
+        required: [true, 'Public ID is required'],
+        trim: true,
+      },
+      secure_url: {
+        type: String,
+        required: [true, 'Secure URL is required'],
+        trim: true,
+      },
     },
     owner: {
       type: Schema.Types.ObjectId,
@@ -14,9 +21,16 @@ const videoSchema = new Schema<IVideo>(
       required: true,
     },
     thumbnail: {
-      type: String,
-      required: true,
-      trim: true,
+      public_id: {
+        type: String,
+        required: [true, 'Public ID is required'],
+        trim: true,
+      },
+      secure_url: {
+        type: String,
+        required: [true, 'Secure URL is required'],
+        trim: true,
+      },
     },
     title: {
       type: String,

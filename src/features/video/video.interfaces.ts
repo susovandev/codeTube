@@ -1,10 +1,10 @@
-import { IUser } from '../user/user.interfaces';
+import { IImageInfo, IUser } from '../user/user.interfaces';
 
 export interface IVideo {
   _id: string;
-  videoFile: string;
+  videoFile: IImageInfo;
   owner: IUser;
-  thumbnail: string;
+  thumbnail: IImageInfo;
   title: string;
   description: string;
   duration: number;

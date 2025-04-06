@@ -34,6 +34,25 @@ class Cloudinary {
       throw new InternalServerError('Error deleting image');
     }
   }
+
+  async uploadVideoOnCloud(localFilePath: string): Promise<UploadApiResponse> {
+    try {
+      const data = await cloudinary.uploader.upload(localFilePath, {
+        folder: 'videos',
+        resource_type: 'video',
+        transformation: [{ quality: 'auto:best' }],
+        media_metadata: true,
+      });
+      fs.unlinkSync(localFilePath);
+      return data;
+    } catch (error) {
+      if (fs.existsSync(localFilePath)) {
+        fs.unlinkSync(localFilePath);
+      }
+      console.error('Cloudinary Upload Error:', error);
+      throw new InternalServerError('Error uploading video');
+    }
+  }
 }
 
 export default new Cloudinary();

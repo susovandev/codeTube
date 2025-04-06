@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Schema } from 'joi';
 import { BadRequestError } from '../utils/custom.error';
+import fs from 'fs';
 
 export const validate = (schema: Schema) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -9,7 +10,24 @@ export const validate = (schema: Schema) => {
       stripUnknown: true,
     });
 
+    console.log(`Validation Error: `, error);
     if (error) {
+      // Clean up uploaded files if validation fails
+      const files = req.files as
+        | {
+            [fieldname: string]: Express.Multer.File[];
+          }
+        | undefined;
+
+      if (files) {
+        Object.values(files)
+          .flat()
+          .forEach((file) => {
+            if (fs.existsSync(file.path)) {
+              fs.unlinkSync(file.path);
+            }
+          });
+      }
       const errorMessage = error.details
         .map((detail) => detail.message.replace(/"/g, ''))
         .join(', ');
