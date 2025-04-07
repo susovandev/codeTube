@@ -6,6 +6,7 @@ import { CustomRequest } from '../../middleware/auth.middleware';
 import { ApiResponse } from '../../utils/ApiResponse';
 import fs from 'fs';
 import videoServices from './video.services';
+import { Types } from 'mongoose';
 
 class VideoController {
   /**
@@ -89,8 +90,8 @@ class VideoController {
   }
 
   /**
-   * @desc    Upload a video
-   * @route   POST /api/video/upload
+   * @desc    Get a video
+   * @route   GET /api/video/:videoId
    * @access  Private
    */
 
@@ -103,8 +104,11 @@ class VideoController {
       throw new BadRequestError('Video ID is required');
     }
 
+    // Convert video ID to ObjectId
+    const objectId = new Types.ObjectId(videoId);
+
     // Get video by ID
-    const video = await videoServices.getVideoById(videoId);
+    const video = await videoServices.getVideoById(objectId);
 
     // If video is not found, throw an error
     if (!video) {
@@ -116,6 +120,43 @@ class VideoController {
       .json(
         new ApiResponse(StatusCodes.OK, 'Video fetched successfully', video),
       );
+  }
+
+  /**
+   * @desc    Delete a video
+   * @route   DELETE /api/video/:videoId
+   * @access  Private
+   */
+
+  async deleteVideoById(req: Request<{ videoId: string }>, res: Response) {
+    // Extract video ID from request
+    const { videoId } = req.params;
+
+    // Check if video ID is provided
+    if (!videoId) {
+      throw new BadRequestError('Video ID is required');
+    }
+
+    // Validate videoId before converting
+    if (!Types.ObjectId.isValid(videoId)) {
+      throw new BadRequestError('Invalid video ID');
+    }
+
+    // Convert video ID to ObjectId
+    const objectId = new Types.ObjectId(videoId);
+
+    // Delete video
+    const video = await videoServices.deleteVideoById(objectId);
+
+    // If video is not found, throw an error
+    if (!video) {
+      throw new BadRequestError('Video not found');
+    }
+
+    // Send response
+    res
+      .status(StatusCodes.OK)
+      .json(new ApiResponse(StatusCodes.OK, 'Video deleted successfully'));
   }
 }
 

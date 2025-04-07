@@ -2,7 +2,7 @@ import { IImageInfo, IUser } from '../user/user.interfaces';
 import { Types } from 'mongoose';
 
 export interface IVideo {
-  _id: string;
+  _id: Types.ObjectId;
   videoFile: IImageInfo;
   owner: Types.ObjectId | IUser;
   thumbnail: IImageInfo;

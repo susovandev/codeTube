@@ -26,6 +26,9 @@ videoRouter.post(
   asyncWrapper(videoControllers.publishVideo),
 );
 
-videoRouter.route('/:videoId').get(asyncWrapper(videoControllers.getVideoById));
+videoRouter
+  .route('/:videoId')
+  .get(asyncWrapper(videoControllers.getVideoById))
+  .delete(asyncWrapper(videoControllers.deleteVideoById));
 
 export default videoRouter;
