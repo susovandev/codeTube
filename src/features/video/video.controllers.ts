@@ -87,6 +87,36 @@ class VideoController {
       throw new BadRequestError('Error uploading video');
     }
   }
+
+  /**
+   * @desc    Upload a video
+   * @route   POST /api/video/upload
+   * @access  Private
+   */
+
+  async getVideoById(req: Request, res: Response) {
+    // Extract video ID from request
+    const { videoId } = req.params;
+
+    // Check if video ID is provided
+    if (!videoId) {
+      throw new BadRequestError('Video ID is required');
+    }
+
+    // Get video by ID
+    const video = await videoServices.getVideoById(videoId);
+
+    // If video is not found, throw an error
+    if (!video) {
+      throw new BadRequestError('Video not found');
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(StatusCodes.OK, 'Video fetched successfully', video),
+      );
+  }
 }
 
 export default new VideoController();

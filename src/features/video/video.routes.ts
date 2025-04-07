@@ -26,4 +26,6 @@ videoRouter.post(
   asyncWrapper(videoControllers.publishVideo),
 );
 
+videoRouter.route('/:videoId').get(asyncWrapper(videoControllers.getVideoById));
+
 export default videoRouter;
