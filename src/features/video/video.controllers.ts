@@ -305,6 +305,31 @@ class VideoController {
       );
     }
   }
+
+  /**
+   * @desc    Update a video
+   * @route   PATCH /api/videos/:videoId
+   * @access  Private
+   */
+
+  async togglePublishStatus(req: Request, res: Response) {
+    const { videoId } = req.params;
+
+    const video = await Video.findById(videoId);
+
+    if (!video) {
+      throw new BadRequestError('Video not found');
+    }
+
+    video.isPublished = !video.isPublished;
+    await video.save();
+    res.status(StatusCodes.OK).json(
+      new ApiResponse(StatusCodes.OK, 'Video status updated successfully', {
+        videoId: video?._id,
+        isPublished: video?.isPublished,
+      }),
+    );
+  }
 }
 
 export default new VideoController();

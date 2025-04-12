@@ -5,6 +5,7 @@ import { upload } from '../../middleware/multer.middleware';
 import { validate } from '../../middleware/validation.middleware';
 import { publishVideoSchema } from './video.validation.';
 import { authMiddleware } from '../../middleware/auth.middleware';
+import videoServices from './video.services';
 
 const videoRouter = Router();
 
@@ -34,5 +35,9 @@ videoRouter
     asyncWrapper(videoControllers.updateVideoById),
   )
   .delete(asyncWrapper(videoControllers.deleteVideoById));
+
+videoRouter
+  .route('/toggle/publish/:videoId')
+  .patch(videoControllers.togglePublishStatus);
 
 export default videoRouter;
