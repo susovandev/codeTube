@@ -5,7 +5,6 @@ import { upload } from '../../middleware/multer.middleware';
 import { validate } from '../../middleware/validation.middleware';
 import { publishVideoSchema } from './video.validation.';
 import { authMiddleware } from '../../middleware/auth.middleware';
-import videoServices from './video.services';
 
 const videoRouter = Router();
 
