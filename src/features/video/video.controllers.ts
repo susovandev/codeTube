@@ -7,11 +7,76 @@ import { ApiResponse } from '../../utils/ApiResponse';
 import fs from 'fs';
 import videoServices from './video.services';
 import { Types } from 'mongoose';
+import { Video } from './video.model';
+import { IVideo } from './video.interfaces';
 
 class VideoController {
   /**
+   * @desc    Get all videos with pagination
+   * @route   POST /api/videos
+   * @access  Private
+   */
+
+  async getAllVideos(req: Request, res: Response) {
+    // Extract pagination and sorting parameters
+    const {
+      page = '1',
+      limit = '10',
+      query = '',
+      sortBy = 'createdAt',
+      sortType = 'desc',
+      userId,
+    } = req.query as {
+      page?: string;
+      limit?: string;
+      query?: string;
+      sortBy?: string;
+      sortType?: 'asc' | 'desc';
+      userId?: string;
+    };
+
+    // Parse pagination and sorting parameters
+    const pageNo = parseInt(page, 10);
+    const limitNo = parseInt(limit, 10);
+    const sortOrder = sortType === 'desc' ? -1 : 1;
+
+    // Define query filter
+    type VideoQueryFilter = {
+      title?: { $regex: string; $options: string };
+      user?: string;
+    };
+
+    const filter: VideoQueryFilter = {
+      title: { $regex: query, $options: 'i' },
+    };
+
+    // Apply user filter
+    if (userId) {
+      filter.user = userId;
+    }
+
+    const sortOptions: Record<string, 1 | -1> = {
+      [sortBy]: sortOrder,
+    };
+
+    // Fetch videos from database
+    const videos = await Video.find(filter)
+      .sort(sortOptions)
+      .skip((pageNo - 1) * limitNo)
+      .limit(limitNo);
+
+    const totalVideos = await Video.countDocuments(filter);
+
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(StatusCodes.OK, 'Videos fetched successfully', videos),
+      );
+  }
+
+  /**
    * @desc    Upload a video
-   * @route   POST /api/video/upload
+   * @route   POST /api/videos/upload
    * @access  Private
    */
   async publishVideo(req: CustomRequest, res: Response) {
@@ -91,7 +156,7 @@ class VideoController {
 
   /**
    * @desc    Get a video
-   * @route   GET /api/video/:videoId
+   * @route   GET /api/videos/:videoId
    * @access  Private
    */
 
@@ -124,7 +189,7 @@ class VideoController {
 
   /**
    * @desc    Delete a video
-   * @route   DELETE /api/video/:videoId
+   * @route   DELETE /api/videos/:videoId
    * @access  Private
    */
 
@@ -157,6 +222,88 @@ class VideoController {
     res
       .status(StatusCodes.OK)
       .json(new ApiResponse(StatusCodes.OK, 'Video deleted successfully'));
+  }
+
+  /**
+   * @desc    Update a video
+   * @route   PATCH /api/videos/:videoId
+   * @access  Private
+   */
+
+  async updateVideoById(
+    req: Request<{ videoId: string }, {}, Partial<IVideo>>,
+    res: Response,
+  ) {
+    const { title, description, category, tags } = req.body;
+    const { videoId } = req.params;
+    const thumbnailLocalFilePath = req.file;
+
+    try {
+      const video = await Video.findById(videoId);
+      if (!video) {
+        throw new BadRequestError('Video not found');
+      }
+
+      // Delete old thumbnail from Cloudinary
+      if (video.thumbnail?.public_id) {
+        await Cloudinary.deleteImageOnCloud(video.thumbnail.public_id);
+      }
+
+      // Upload new thumbnail
+      if (thumbnailLocalFilePath) {
+        const thumbnailData = await Cloudinary.uploadImageOnCloud(
+          thumbnailLocalFilePath.path,
+          'thumbnails',
+        );
+
+        if (!thumbnailData) {
+          throw new BadRequestError(
+            'Failed to upload thumbnail. Please try again.',
+          );
+        }
+
+        video.thumbnail = {
+          public_id: thumbnailData.public_id,
+          secure_url: thumbnailData.secure_url,
+        };
+
+        // Delete local file after upload
+        if (fs.existsSync(thumbnailLocalFilePath.path)) {
+          fs.unlinkSync(thumbnailLocalFilePath.path);
+        }
+      }
+
+      // Update other fields
+      if (title) video.title = title;
+      if (description) video.description = description;
+      if (category) video.category = category;
+      if (tags) video.tags = tags;
+
+      const updatedVideo = await video.save();
+
+      res
+        .status(StatusCodes.OK)
+        .json(
+          new ApiResponse(
+            StatusCodes.OK,
+            'Video updated successfully',
+            updatedVideo,
+          ),
+        );
+    } catch (error) {
+      // Clean up local thumbnail if exists
+      if (
+        thumbnailLocalFilePath &&
+        fs.existsSync(thumbnailLocalFilePath.path)
+      ) {
+        fs.unlinkSync(thumbnailLocalFilePath.path);
+      }
+
+      console.error('Video update error:', error);
+      throw new BadRequestError(
+        'Something went wrong while updating the video.',
+      );
+    }
   }
 }
 

@@ -29,6 +29,10 @@ videoRouter.post(
 videoRouter
   .route('/:videoId')
   .get(asyncWrapper(videoControllers.getVideoById))
+  .patch(
+    upload.single('thumbnail'),
+    asyncWrapper(videoControllers.updateVideoById),
+  )
   .delete(asyncWrapper(videoControllers.deleteVideoById));
 
 export default videoRouter;
