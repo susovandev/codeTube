@@ -67,11 +67,16 @@ class VideoController {
 
     const totalVideos = await Video.countDocuments(filter);
 
-    res
-      .status(StatusCodes.OK)
-      .json(
-        new ApiResponse(StatusCodes.OK, 'Videos fetched successfully', videos),
-      );
+    // Calculate total pages
+    const totalPages = Math.ceil(totalVideos / limitNo);
+
+    res.status(StatusCodes.OK).json(
+      new ApiResponse(StatusCodes.OK, 'Videos fetched successfully', {
+        videos,
+        totalVideos,
+        totalPages,
+      }),
+    );
   }
 
   /**

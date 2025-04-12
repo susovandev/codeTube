@@ -11,6 +11,7 @@ const videoRouter = Router();
 
 videoRouter.use(asyncWrapper(authMiddleware));
 
+videoRouter.get('/', asyncWrapper(videoControllers.getAllVideos));
 videoRouter.post(
   '/upload',
   upload.fields([

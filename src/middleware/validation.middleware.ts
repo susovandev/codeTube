@@ -10,7 +10,6 @@ export const validate = (schema: Schema) => {
       stripUnknown: true,
     });
 
-    console.log(`Validation Error: `, error);
     if (error) {
       // Clean up uploaded files if validation fails
       const files = req.files as
