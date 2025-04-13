@@ -11,6 +11,18 @@ const playListSchema = new Schema<IPlaylist>(
       type: String,
       required: true,
     },
+    playlistCoverImage: {
+      public_id: {
+        type: String,
+        required: [true, 'Public ID is required'],
+        trim: true,
+      },
+      secure_url: {
+        type: String,
+        required: [true, 'Secure URL is required'],
+        trim: true,
+      },
+    },
     videos: [
       {
         type: Schema.Types.ObjectId,

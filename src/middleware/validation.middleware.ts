@@ -9,7 +9,6 @@ export const validate = (schema: Schema) => {
       abortEarly: false,
       stripUnknown: true,
     });
-
     if (error) {
       // Clean up uploaded files if validation fails
       const files = req.files as

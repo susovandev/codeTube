@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { asyncWrapper } from '../../utils/asyncWrapper';
-import videoControllers from './video.controllers';
+import videoControllers from './video.controller';
 import { upload } from '../../middleware/multer.middleware';
 import { validate } from '../../middleware/validation.middleware';
 import { publishVideoSchema } from './video.validation.';

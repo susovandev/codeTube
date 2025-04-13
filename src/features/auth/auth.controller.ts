@@ -267,6 +267,7 @@ class AuthController {
           ),
         );
     } catch (error) {
+      console.log(error);
       throw new UnAuthorizedException(
         'Invalid or expired refresh token. Please login again.',
       );

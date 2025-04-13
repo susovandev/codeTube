@@ -1,9 +1,10 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { IVideo } from '../video/video.interfaces';
-import { IUser } from '../user/user.interfaces';
+import { IImageInfo, IUser } from '../user/user.interfaces';
 export interface IPlaylist extends Document {
   name: string;
   description: string;
+  playlistCoverImage: IImageInfo;
   videos: IVideo[];
-  owner: IUser;
+  owner: Types.ObjectId | IUser;
 }
