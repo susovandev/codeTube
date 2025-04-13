@@ -1,4 +1,4 @@
-import e, { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ApiResponse } from '../../utils/ApiResponse';
 import Playlist from './playlist.model';
 import { CustomRequest } from '../../middleware/auth.middleware';
@@ -7,6 +7,7 @@ import playlistService from './playlist.service';
 import mongoose from 'mongoose';
 import { BadRequestError, InternalServerError } from '../../utils/custom.error';
 import fs from 'fs';
+import { IPlaylist } from './playlist.interface';
 class PlaylistController {
   /**
    * @desc    Create a Playlist
@@ -14,22 +15,25 @@ class PlaylistController {
    * @access  Private
    */
   async createPlaylist(req: CustomRequest, res: Response) {
+    // Get name, description, playlistCoverImage From Request
     const { name, description } = req.body;
     const playlistCoverImageLocalPath = req.file?.path;
 
     if (!playlistCoverImageLocalPath) {
-      throw new Error('Playlist cover image is required');
+      throw new BadRequestError('Playlist cover image is required');
     }
 
+    // Upload playlistCoverImage to Cloudinary
     const playlistCoverImage = await cloudinary.uploadImageOnCloud(
       playlistCoverImageLocalPath,
       'playlist',
     );
 
     if (!playlistCoverImage) {
-      throw new Error('Failed to upload playlist cover image');
+      throw new BadRequestError('Failed to upload playlist cover image');
     }
 
+    // Create playlist
     const newPlaylist = await playlistService.createPlaylist({
       name,
       description,
@@ -41,9 +45,10 @@ class PlaylistController {
     });
 
     if (!newPlaylist) {
-      throw new Error('Failed to create playlist');
+      throw new InternalServerError('Failed to create playlist');
     }
 
+    // Send response
     res
       .status(201)
       .json(new ApiResponse(201, 'Playlist created successfully', newPlaylist));
@@ -54,12 +59,12 @@ class PlaylistController {
    * @route   GET /api/playlists/:playlistId
    * @access  Private
    */
-  async getPlaylistsById(req: Request, res: Response) {
+  async getPlaylistsById(req: Request<{ playlistId: string }>, res: Response) {
     const { playlistId } = req.params;
     const playlists = await playlistService.getPlaylistsById(playlistId);
 
     if (!playlists) {
-      throw new Error('Failed to fetch playlists');
+      throw new BadRequestError('Failed to fetch playlists');
     }
 
     res
@@ -73,7 +78,11 @@ class PlaylistController {
    * @access  Private
    */
 
-  async updatePlaylistsById(req: Request, res: Response, next: NextFunction) {
+  async updatePlaylistsById(
+    req: Request<{ playlistId: string }, {}, IPlaylist>,
+    res: Response,
+    next: NextFunction,
+  ) {
     // Get name, description, playlistCoverImage & playlistId from request
     const { name, description } = req.body;
     const playlistCoverImageLocalPath = req.file?.path;
@@ -145,6 +154,52 @@ class PlaylistController {
       }
       next(error);
     }
+  }
+
+  /**
+   * @desc    Delete a Playlist By Id
+   * @route   DELETE /api/playlists/:playlistId
+   * @access  Private
+   */
+
+  async deletePlaylistsById(
+    req: Request<{ playlistId: string }>,
+    res: Response,
+  ) {
+    const { playlistId } = req.params;
+
+    // Check if playlistId is valid
+    if (!mongoose.Types.ObjectId.isValid(playlistId)) {
+      throw new BadRequestError('Invalid playlist ID');
+    }
+
+    // Get playlist by id
+    const playlist = await playlistService.getPlaylistsById(playlistId);
+
+    if (!playlist) {
+      throw new InternalServerError('Failed to delete playlist');
+    }
+
+    // Delete playlist cover image from cloudinary
+    try {
+      if (
+        playlist?.playlistCoverImage &&
+        playlist?.playlistCoverImage?.public_id
+      ) {
+        await cloudinary.deleteImageOnCloud(
+          playlist?.playlistCoverImage?.public_id,
+        );
+      }
+    } catch (error) {
+      console.error('Cloudinary Delete Error:', error);
+      throw new InternalServerError('Error deleting image');
+    }
+
+    // Delete playlist
+    await playlistService.deletePlaylistsById(playlistId);
+
+    // Send response
+    res.status(200).json(new ApiResponse(200, 'Playlist deleted successfully'));
   }
 }
 

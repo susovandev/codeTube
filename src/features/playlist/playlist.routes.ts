@@ -28,5 +28,6 @@ playlistRouter
     upload.single('playlistCoverImage'),
     validate(updatePlaylistSchema),
     asyncWrapper(playlistControllers.updatePlaylistsById),
-  );
+  )
+  .delete(asyncWrapper(playlistControllers.deletePlaylistsById));
 export default playlistRouter;

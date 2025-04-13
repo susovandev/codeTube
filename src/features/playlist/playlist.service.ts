@@ -11,6 +11,10 @@ class PlaylistServices {
   async getPlaylistsById(playlistId: string): Promise<IPlaylist | null> {
     return await Playlist.findById(playlistId);
   }
+
+  async deletePlaylistsById(playlistId: string): Promise<null> {
+    return await Playlist.findByIdAndDelete(playlistId);
+  }
 }
 
 export default new PlaylistServices();
