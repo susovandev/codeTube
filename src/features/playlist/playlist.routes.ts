@@ -3,7 +3,10 @@ import { authMiddleware } from '../../middleware/auth.middleware';
 import { asyncWrapper } from '../../utils/asyncWrapper';
 import playlistControllers from './playlist.controller';
 import { validate } from '../../middleware/validation.middleware';
-import { createPlaylistSchema } from './playlist.validation';
+import {
+  createPlaylistSchema,
+  updatePlaylistSchema,
+} from './playlist.validation';
 import { upload } from '../../middleware/multer.middleware';
 
 const playlistRouter = Router();
@@ -20,5 +23,10 @@ playlistRouter
 
 playlistRouter
   .route('/:playlistId')
-  .get(asyncWrapper(playlistControllers.getPlaylistsById));
+  .get(asyncWrapper(playlistControllers.getPlaylistsById))
+  .patch(
+    upload.single('playlistCoverImage'),
+    validate(updatePlaylistSchema),
+    asyncWrapper(playlistControllers.updatePlaylistsById),
+  );
 export default playlistRouter;
