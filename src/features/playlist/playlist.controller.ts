@@ -45,6 +45,19 @@ class PlaylistController {
       .status(201)
       .json(new ApiResponse(201, 'Playlist created successfully', newPlaylist));
   }
+
+  async getPlaylistsById(req: Request, res: Response) {
+    const { playlistId } = req.params;
+    const playlists = await playlistService.getPlaylistsById(playlistId);
+
+    if (!playlists) {
+      throw new Error('Failed to fetch playlists');
+    }
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, 'Playlists fetched successfully', playlists));
+  }
 }
 
 export default new PlaylistController();

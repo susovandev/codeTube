@@ -17,4 +17,8 @@ playlistRouter
     validate(createPlaylistSchema),
     asyncWrapper(playlistControllers.createPlaylist),
   );
+
+playlistRouter
+  .route('/:playlistId')
+  .get(asyncWrapper(playlistControllers.getPlaylistsById));
 export default playlistRouter;
