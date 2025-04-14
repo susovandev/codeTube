@@ -9,6 +9,7 @@ import fs from 'fs';
 import { IPlaylist } from './playlist.interface';
 import videoServices from '../video/video.services';
 import { StatusCodes } from 'http-status-codes';
+import Playlist from './playlist.model';
 
 class PlaylistController {
   /**
@@ -221,7 +222,7 @@ class PlaylistController {
    * @access  Private
    */
 
-  async getUserPlaylists(req: Request, res: Response) {
+  async getUserPlaylists(req: Request<{ userId: string }>, res: Response) {
     // Get user id from request
     const { userId } = req.params;
 
@@ -230,7 +231,7 @@ class PlaylistController {
     }
 
     // Get playlists by user id
-    const playlists = await playlistService.getUserPlaylists(userId);
+    const playlists = await playlistService.getUserPlaylistsDetails(userId);
 
     if (!playlists) {
       throw new InternalServerError('Failed to fetch playlists');

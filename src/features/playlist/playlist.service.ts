@@ -19,6 +19,17 @@ class PlaylistServices {
   async getUserPlaylists(userId: string) {
     return await Playlist.find({ owner: userId });
   }
+
+  async getUserPlaylistsDetails(userId: string) {
+    return await Playlist.find({ owner: userId })
+      .populate({
+        path: 'videos',
+      })
+      .populate({
+        path: 'owner',
+        select: 'username email fullName',
+      });
+  }
 }
 
 export default new PlaylistServices();
