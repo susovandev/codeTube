@@ -7,6 +7,9 @@ import mongoose from 'mongoose';
 import { BadRequestError, InternalServerError } from '../../utils/custom.error';
 import fs from 'fs';
 import { IPlaylist } from './playlist.interface';
+import videoServices from '../video/video.services';
+import { StatusCodes } from 'http-status-codes';
+
 class PlaylistController {
   /**
    * @desc    Create a Playlist
@@ -49,8 +52,14 @@ class PlaylistController {
 
     // Send response
     res
-      .status(201)
-      .json(new ApiResponse(201, 'Playlist created successfully', newPlaylist));
+      .status(StatusCodes.CREATED)
+      .json(
+        new ApiResponse(
+          StatusCodes.CREATED,
+          'Playlist created successfully',
+          newPlaylist,
+        ),
+      );
   }
 
   /**
@@ -59,13 +68,16 @@ class PlaylistController {
    * @access  Private
    */
   async getPlaylistsById(req: Request<{ playlistId: string }>, res: Response) {
+    // Get playlistId from request
     const { playlistId } = req.params;
-    const playlists = await playlistService.getPlaylistsById(playlistId);
 
+    // Get playlist by id
+    const playlists = await playlistService.getPlaylistsById(playlistId);
     if (!playlists) {
       throw new BadRequestError('Failed to fetch playlists');
     }
 
+    // Send response
     res
       .status(200)
       .json(new ApiResponse(200, 'Playlists fetched successfully', playlists));
@@ -135,10 +147,10 @@ class PlaylistController {
 
       // Send response
       res
-        .status(200)
+        .status(StatusCodes.OK)
         .json(
           new ApiResponse(
-            200,
+            StatusCodes.OK,
             'Playlist updated successfully',
             updatedPlaylist,
           ),
@@ -198,7 +210,9 @@ class PlaylistController {
     await playlistService.deletePlaylistsById(playlistId);
 
     // Send response
-    res.status(200).json(new ApiResponse(200, 'Playlist deleted successfully'));
+    res
+      .status(StatusCodes.OK)
+      .json(new ApiResponse(StatusCodes.OK, 'Playlist deleted successfully'));
   }
 
   /**
@@ -224,9 +238,60 @@ class PlaylistController {
 
     // Send response
     res
-      .status(200)
+      .status(StatusCodes.OK)
       .json(
-        new ApiResponse(200, 'User Playlists fetched successfully', playlists),
+        new ApiResponse(
+          StatusCodes.OK,
+          'User Playlists fetched successfully',
+          playlists,
+        ),
+      );
+  }
+
+  /**
+   * @desc    Add Video to User Playlists
+   * @route   PATCH /api/playlists/add/:videoId/:playlistId
+   * @access  Private
+   */
+
+  async addVideoToPlaylist(
+    req: Request<{ videoId: string; playlistId: string }>,
+    res: Response,
+  ) {
+    // Get video id and playlist id from request
+    const { videoId, playlistId } = req.params;
+
+    // Get playlist by id
+    const playlist = await playlistService.getPlaylistsById(playlistId);
+    if (!playlist) {
+      throw new BadRequestError('Playlist not found');
+    }
+
+    // Get video by id
+    const video = await videoServices.getVideoById(videoId);
+    if (!video) {
+      throw new BadRequestError('Video not found');
+    }
+
+    // check if already exists
+    const alreadyExists = playlist.videos.includes(video._id);
+    if (alreadyExists) {
+      throw new BadRequestError('Video already exists in playlist');
+    }
+
+    // Add video to playlist
+    playlist.videos.push(video._id);
+    await playlist.save();
+
+    // Send response
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          'Video added to playlist successfully',
+          playlist,
+        ),
       );
   }
 }

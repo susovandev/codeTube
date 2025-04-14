@@ -6,7 +6,6 @@ import { CustomRequest } from '../../middleware/auth.middleware';
 import { ApiResponse } from '../../utils/ApiResponse';
 import fs from 'fs';
 import videoServices from './video.services';
-import { Types } from 'mongoose';
 import { Video } from './video.model';
 import { IVideo } from './video.interfaces';
 
@@ -174,11 +173,8 @@ class VideoController {
       throw new BadRequestError('Video ID is required');
     }
 
-    // Convert video ID to ObjectId
-    const objectId = new Types.ObjectId(videoId);
-
     // Get video by ID
-    const video = await videoServices.getVideoById(objectId);
+    const video = await videoServices.getVideoById(videoId);
 
     // If video is not found, throw an error
     if (!video) {
@@ -207,16 +203,8 @@ class VideoController {
       throw new BadRequestError('Video ID is required');
     }
 
-    // Validate videoId before converting
-    if (!Types.ObjectId.isValid(videoId)) {
-      throw new BadRequestError('Invalid video ID');
-    }
-
-    // Convert video ID to ObjectId
-    const objectId = new Types.ObjectId(videoId);
-
     // Delete video
-    const video = await videoServices.deleteVideoById(objectId);
+    const video = await videoServices.deleteVideoById(videoId);
 
     // If video is not found, throw an error
     if (!video) {
@@ -244,20 +232,20 @@ class VideoController {
     const thumbnailLocalFilePath = req.file;
 
     try {
-      const video = await Video.findById(videoId);
+      const video = await videoServices.getVideoById(videoId);
       if (!video) {
         throw new BadRequestError('Video not found');
       }
 
       // Delete old thumbnail from Cloudinary
       if (video.thumbnail?.public_id) {
-        await Cloudinary.deleteImageOnCloud(video.thumbnail.public_id);
+        await Cloudinary.deleteImageOnCloud(video?.thumbnail?.public_id);
       }
 
       // Upload new thumbnail
       if (thumbnailLocalFilePath) {
         const thumbnailData = await Cloudinary.uploadImageOnCloud(
-          thumbnailLocalFilePath.path,
+          thumbnailLocalFilePath?.path,
           'thumbnails',
         );
 
@@ -268,13 +256,13 @@ class VideoController {
         }
 
         video.thumbnail = {
-          public_id: thumbnailData.public_id,
-          secure_url: thumbnailData.secure_url,
+          public_id: thumbnailData?.public_id,
+          secure_url: thumbnailData?.secure_url,
         };
 
         // Delete local file after upload
-        if (fs.existsSync(thumbnailLocalFilePath.path)) {
-          fs.unlinkSync(thumbnailLocalFilePath.path);
+        if (fs.existsSync(thumbnailLocalFilePath?.path)) {
+          fs.unlinkSync(thumbnailLocalFilePath?.path);
         }
       }
 
@@ -320,7 +308,7 @@ class VideoController {
   async togglePublishStatus(req: Request, res: Response) {
     const { videoId } = req.params;
 
-    const video = await Video.findById(videoId);
+    const video = await videoServices.getVideoById(videoId);
 
     if (!video) {
       throw new BadRequestError('Video not found');

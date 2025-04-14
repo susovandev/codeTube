@@ -1,7 +1,7 @@
 import { IImageInfo, IUser } from '../user/user.interfaces';
-import { Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
-export interface IVideo {
+export interface IVideo extends Document {
   _id: Types.ObjectId;
   videoFile: IImageInfo;
   owner: Types.ObjectId | IUser;

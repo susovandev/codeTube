@@ -1,4 +1,3 @@
-import { Types } from 'mongoose';
 import { IVideo } from './video.interfaces';
 import { Video } from './video.model';
 
@@ -7,11 +6,11 @@ class VideoServices {
     return await Video.create(requestBody);
   }
 
-  async getVideoById(videoId: Types.ObjectId): Promise<IVideo | null> {
+  async getVideoById(videoId: string): Promise<IVideo | null> {
     return await Video.findById({ _id: videoId });
   }
 
-  async deleteVideoById(videoId: Types.ObjectId): Promise<null> {
+  async deleteVideoById(videoId: string): Promise<null> {
     return Video.findOneAndDelete({ _id: videoId }, { new: true });
   }
 }
