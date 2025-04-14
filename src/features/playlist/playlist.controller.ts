@@ -9,7 +9,6 @@ import fs from 'fs';
 import { IPlaylist } from './playlist.interface';
 import videoServices from '../video/video.services';
 import { StatusCodes } from 'http-status-codes';
-import Playlist from './playlist.model';
 
 class PlaylistController {
   /**
@@ -291,6 +290,56 @@ class PlaylistController {
         new ApiResponse(
           StatusCodes.OK,
           'Video added to playlist successfully',
+          playlist,
+        ),
+      );
+  }
+
+  /**
+   * @desc    Remove Video from User Playlists
+   * @route   PATCH /api/playlists/add/:videoId/:playlistId
+   * @access  Private
+   */
+
+  async removeVideoToPlaylist(
+    req: Request<{ videoId: string; playlistId: string }>,
+    res: Response,
+  ) {
+    // Get video id and playlist id from request
+    const { videoId, playlistId } = req.params;
+
+    // Get playlist by id
+    const playlist = await playlistService.getPlaylistsById(playlistId);
+    if (!playlist) {
+      throw new BadRequestError('Playlist not found');
+    }
+
+    // Get video by id
+    const video = await videoServices.getVideoById(videoId);
+    if (!video) {
+      throw new BadRequestError('Video not found');
+    }
+
+    // check if already exists
+    const alreadyExists = playlist.videos.includes(video._id);
+    if (!alreadyExists) {
+      throw new BadRequestError('Video not found in playlist');
+    }
+
+    // Remove video to playlist
+    playlist.videos = playlist.videos.filter(
+      (videoId) => videoId.toString() !== video._id.toString(),
+    );
+
+    await playlist.save();
+
+    // Send response
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          'Video removed from playlist successfully',
           playlist,
         ),
       );

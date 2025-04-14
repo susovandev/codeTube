@@ -36,6 +36,10 @@ playlistRouter
   .patch(asyncWrapper(playlistControllers.addVideoToPlaylist));
 
 playlistRouter
+  .route('/remove/:videoId/:playlistId')
+  .patch(asyncWrapper(playlistControllers.removeVideoToPlaylist));
+
+playlistRouter
   .route('/user/:userId')
   .get(asyncWrapper(playlistControllers.getUserPlaylists));
 export default playlistRouter;
