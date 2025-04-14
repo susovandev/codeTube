@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { ApiResponse } from '../../utils/ApiResponse';
-import Playlist from './playlist.model';
 import { CustomRequest } from '../../middleware/auth.middleware';
 import cloudinary from '../../utils/cloudinary';
 import playlistService from './playlist.service';
@@ -200,6 +199,35 @@ class PlaylistController {
 
     // Send response
     res.status(200).json(new ApiResponse(200, 'Playlist deleted successfully'));
+  }
+
+  /**
+   * @desc    Get User Playlists
+   * @route   GET /api/playlists/:playlistId
+   * @access  Private
+   */
+
+  async getUserPlaylists(req: Request, res: Response) {
+    // Get user id from request
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new BadRequestError('Invalid user ID');
+    }
+
+    // Get playlists by user id
+    const playlists = await playlistService.getUserPlaylists(userId);
+
+    if (!playlists) {
+      throw new InternalServerError('Failed to fetch playlists');
+    }
+
+    // Send response
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, 'User Playlists fetched successfully', playlists),
+      );
   }
 }
 

@@ -15,6 +15,10 @@ class PlaylistServices {
   async deletePlaylistsById(playlistId: string): Promise<null> {
     return await Playlist.findByIdAndDelete(playlistId);
   }
+
+  async getUserPlaylists(userId: string) {
+    return await Playlist.find({ owner: userId });
+  }
 }
 
 export default new PlaylistServices();

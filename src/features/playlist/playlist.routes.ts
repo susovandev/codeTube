@@ -30,4 +30,8 @@ playlistRouter
     asyncWrapper(playlistControllers.updatePlaylistsById),
   )
   .delete(asyncWrapper(playlistControllers.deletePlaylistsById));
+
+playlistRouter
+  .route('/user/:userId')
+  .get(asyncWrapper(playlistControllers.getUserPlaylists));
 export default playlistRouter;
