@@ -2,14 +2,23 @@ import { IComments } from './comments.interface';
 import Comments from './comments.model';
 
 class commentsService {
-  async createNewComment(requestBody: Partial<IComments>) {
+  async createNewComment(
+    requestBody: Partial<IComments>,
+  ): Promise<IComments | null> {
     return await Comments.create(requestBody);
   }
 
-  async updateCommentById(commentId: string, requestBody: Partial<IComments>) {
+  async updateCommentById(
+    commentId: string,
+    requestBody: Partial<IComments>,
+  ): Promise<IComments | null> {
     return await Comments.findOneAndUpdate({ _id: commentId }, requestBody, {
       new: true,
     });
+  }
+
+  async deleteCommentById(commentId: string): Promise<null> {
+    return await Comments.findOneAndDelete({ _id: commentId }, { new: true });
   }
 }
 

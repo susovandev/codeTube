@@ -24,5 +24,6 @@ commentsRoutes
   .patch(
     validate(updateCommentSchema),
     asyncWrapper(commentsController.updateComment),
-  );
+  )
+  .delete(asyncWrapper(commentsController.deleteComment));
 export default commentsRoutes;

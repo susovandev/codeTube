@@ -91,6 +91,30 @@ class commentsController {
         ),
       );
   }
+
+  /**
+   * @desc    Update a comment
+   * @route   PATCH /api/comments/c/:commentId
+   * @access  Private
+   */
+
+  async deleteComment(req: Request<{ commentId: string }>, res: Response) {
+    const { commentId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      throw new BadRequestError('Invalid comment ID');
+    }
+
+    const comment = await commentsService.deleteCommentById(commentId);
+
+    if (!comment) {
+      throw new InternalServerError('Failed to delete comment');
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json(new ApiResponse(StatusCodes.OK, 'Comment deleted successfully'));
+  }
 }
 
 export default new commentsController();
