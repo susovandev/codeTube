@@ -17,6 +17,9 @@ class commentsController {
     const { videoId } = req.params;
     const { content } = req.body;
 
+    console.log(`videoId`, videoId);
+    console.log(`content`, content);
+
     if (!mongoose.Types.ObjectId.isValid(videoId)) {
       throw new BadRequestError('Invalid video ID');
     }
@@ -26,6 +29,7 @@ class commentsController {
     }
 
     const video = await videoServices.getVideoById(videoId);
+    console.log(`video`, video);
 
     if (!video) {
       throw new BadRequestError('Video not found');
@@ -36,7 +40,7 @@ class commentsController {
       owner: req.user?._id,
       video: video?._id,
     });
-
+    console.log(`comment`, comment);
     if (!comment) {
       throw new InternalServerError('Failed to add comment');
     }
@@ -45,6 +49,46 @@ class commentsController {
       .status(StatusCodes.OK)
       .json(
         new ApiResponse(StatusCodes.OK, 'Comment added successfully', comment),
+      );
+  }
+
+  /**
+   * @desc    Update a comment
+   * @route   PATCH /api/comments/c/:commentId
+   * @access  Private
+   */
+
+  async updateComment(
+    req: Request<{ commentId: string }, {}, { content: string }>,
+    res: Response,
+  ) {
+    const { commentId } = req.params;
+    const { content } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      throw new BadRequestError('Invalid comment ID');
+    }
+
+    if (!content) {
+      throw new BadRequestError('Content is required');
+    }
+
+    const comment = await commentsService.updateCommentById(commentId, {
+      content,
+    });
+
+    if (!comment) {
+      throw new InternalServerError('Failed to update comment');
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          'Comment updated successfully',
+          comment,
+        ),
       );
   }
 }

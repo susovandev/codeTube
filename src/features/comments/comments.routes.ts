@@ -3,7 +3,10 @@ import { authMiddleware } from '../../middleware/auth.middleware';
 import { asyncWrapper } from '../../utils/asyncWrapper';
 import commentsController from './comments.controller';
 import { validate } from '../../middleware/validation.middleware';
-import { createCommentSchema } from './comments.validation';
+import {
+  createCommentSchema,
+  updateCommentSchema,
+} from './comments.validation';
 
 const commentsRoutes = Router();
 
@@ -14,5 +17,12 @@ commentsRoutes
   .post(
     validate(createCommentSchema),
     asyncWrapper(commentsController.addComment),
+  );
+
+commentsRoutes
+  .route('/c/:commentId')
+  .patch(
+    validate(updateCommentSchema),
+    asyncWrapper(commentsController.updateComment),
   );
 export default commentsRoutes;
