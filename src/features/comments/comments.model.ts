@@ -5,15 +5,17 @@ const commentsSchema = new Schema<IComments>(
   {
     content: {
       type: String,
-      required: [true, 'Content '],
+      required: [true, 'Content is required'],
     },
     video: {
       type: Schema.Types.ObjectId,
       ref: 'Video',
+      required: true,
     },
     owner: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
   },
   { timestamps: true },
