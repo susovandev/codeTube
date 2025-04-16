@@ -48,9 +48,6 @@ class commentsController {
     const { videoId } = req.params;
     const { content } = req.body;
 
-    console.log(`videoId`, videoId);
-    console.log(`content`, content);
-
     if (!mongoose.Types.ObjectId.isValid(videoId)) {
       throw new BadRequestError('Invalid video ID');
     }
@@ -60,7 +57,6 @@ class commentsController {
     }
 
     const video = await videoServices.getVideoById(videoId);
-    console.log(`video`, video);
 
     if (!video) {
       throw new BadRequestError('Video not found');
@@ -71,7 +67,7 @@ class commentsController {
       owner: req.user?._id,
       video: video?._id,
     });
-    console.log(`comment`, comment);
+
     if (!comment) {
       throw new InternalServerError('Failed to add comment');
     }
