@@ -6,6 +6,11 @@ import { StatusCodes } from 'http-status-codes';
 import tweetService from './tweet.service';
 
 class TweetController {
+  /**
+   * @desc    Create a New Tweet
+   * @route   POST /api/tweets/
+   * @access  Private
+   */
   async createTweet(req: CustomRequest, res: Response) {
     // Get content from request
     const { content } = req.body;
@@ -28,6 +33,40 @@ class TweetController {
           StatusCodes.CREATED,
           'Tweet created successfully',
           tweet,
+        ),
+      );
+  }
+
+  /**
+   * @desc    Update a Tweet by ID
+   * @route   PATCH /api/tweets/:tweetId
+   * @access  Private
+   */
+
+  async updateTweet(req: Request<{ tweetId: string }>, res: Response) {
+    // Get tweet id from request
+    const { tweetId } = req.params;
+
+    // Get content from request
+    const { content } = req.body;
+
+    // Update tweet
+    const updatedTweet = await tweetService.updateTweetById(tweetId, {
+      content,
+    });
+
+    if (!updatedTweet) {
+      throw new InternalServerError('Failed to update tweet');
+    }
+
+    // Send response
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          'Tweet updated successfully',
+          updatedTweet,
         ),
       );
   }
