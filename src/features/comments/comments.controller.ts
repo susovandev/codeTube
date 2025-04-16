@@ -13,6 +13,37 @@ class commentsController {
    * @access  Private
    */
 
+  async getAllVideoComments(req: Request<{ videoId: string }>, res: Response) {
+    // Get video id from request
+    const { videoId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+      throw new BadRequestError('Invalid video ID');
+    }
+
+    // Get video by id
+    const comments = await commentsService.getAllVideoComments(videoId);
+
+    if (!comments) {
+      throw new InternalServerError('Failed to fetch comments');
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          'Comments fetched successfully',
+          comments,
+        ),
+      );
+  }
+  /**
+   * @desc    Add a comment
+   * @route   POST /api/comments/:videoId
+   * @access  Private
+   */
+
   async addComment(req: CustomRequest, res: Response) {
     const { videoId } = req.params;
     const { content } = req.body;

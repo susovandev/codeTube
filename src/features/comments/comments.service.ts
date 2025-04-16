@@ -2,6 +2,12 @@ import { IComments } from './comments.interface';
 import Comments from './comments.model';
 
 class commentsService {
+  async getAllVideoComments(videoId: string): Promise<IComments[] | null> {
+    return await Comments.find({ video: videoId }).populate({
+      path: 'owner',
+      select: 'username email avatar createdAt',
+    });
+  }
   async createNewComment(
     requestBody: Partial<IComments>,
   ): Promise<IComments | null> {

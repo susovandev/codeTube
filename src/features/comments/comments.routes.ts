@@ -14,6 +14,7 @@ commentsRoutes.use(asyncWrapper(authMiddleware));
 
 commentsRoutes
   .route('/:videoId')
+  .get(commentsController.getAllVideoComments)
   .post(
     validate(createCommentSchema),
     asyncWrapper(commentsController.addComment),
