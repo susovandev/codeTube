@@ -5,6 +5,7 @@ import videoRouter from '../features/video/video.routes';
 import playlistRouter from '../features/playlist/playlist.routes';
 import commentsRoutes from '../features/comments/comments.routes';
 import tweetRouter from '../features/tweet/tweet.routes';
+import likeRouter from '../features/like/like.routes';
 
 export const appRoutes = (app: Application) => {
   app.use('/api/v1/auth', authRouter);
@@ -13,4 +14,5 @@ export const appRoutes = (app: Application) => {
   app.use('/api/v1/playlists', playlistRouter);
   app.use('/api/v1/comments', commentsRoutes);
   app.use('/api/v1/tweets', tweetRouter);
+  app.use('/api/v1/likes', likeRouter);
 };
