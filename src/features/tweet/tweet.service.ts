@@ -16,6 +16,10 @@ class TweetServices {
       { new: true },
     );
   }
+
+  async deleteTweetById(tweetId: string): Promise<null> {
+    return await Tweet.findOneAndDelete({ _id: tweetId }, { new: true });
+  }
 }
 
 export default new TweetServices();

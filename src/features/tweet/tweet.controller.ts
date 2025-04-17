@@ -70,6 +70,29 @@ class TweetController {
         ),
       );
   }
+
+  /**
+   * @desc    Delete a Tweet by ID
+   * @route   DELETE /api/tweets/:tweetId
+   * @access  Private
+   */
+
+  async deleteTweet(req: Request<{ tweetId: string }>, res: Response) {
+    // Get tweet id from request
+    const { tweetId } = req.params;
+
+    // Update tweet
+    const deletedTweet = await tweetService.deleteTweetById(tweetId);
+
+    if (!deletedTweet) {
+      throw new InternalServerError('Failed to delete tweet');
+    }
+
+    // Send response
+    res
+      .status(StatusCodes.OK)
+      .json(new ApiResponse(StatusCodes.OK, 'Tweet deleted successfully'));
+  }
 }
 
 export default new TweetController();

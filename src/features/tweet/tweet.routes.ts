@@ -15,8 +15,6 @@ tweetRouter
 
 tweetRouter
   .route('/:tweetId')
-  .patch(
-    validate(updateTweetSchema),
-    asyncWrapper(tweetController.updateTweet),
-  );
+  .patch(validate(updateTweetSchema), asyncWrapper(tweetController.updateTweet))
+  .delete(asyncWrapper(tweetController.deleteTweet));
 export default tweetRouter;
