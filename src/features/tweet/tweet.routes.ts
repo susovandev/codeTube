@@ -14,6 +14,9 @@ tweetRouter
   .post(validate(createTweetSchema), asyncWrapper(tweetController.createTweet));
 
 tweetRouter
+  .route('/user/:userId')
+  .get(asyncWrapper(tweetController.getUserTweets));
+tweetRouter
   .route('/:tweetId')
   .patch(validate(updateTweetSchema), asyncWrapper(tweetController.updateTweet))
   .delete(asyncWrapper(tweetController.deleteTweet));

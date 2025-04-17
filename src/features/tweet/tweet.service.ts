@@ -2,6 +2,9 @@ import { ITweet } from './tweet.interface';
 import Tweet from './tweet.model';
 
 class TweetServices {
+  async getUserTweetsById(userId: string) {
+    return await Tweet.find({ owner: userId });
+  }
   async createNewTweet(requestData: Partial<ITweet>): Promise<ITweet | null> {
     return await Tweet.create(requestData);
   }

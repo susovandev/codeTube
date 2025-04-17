@@ -1,11 +1,40 @@
 import { Request, Response } from 'express';
 import { CustomRequest } from '../../middleware/auth.middleware';
-import { InternalServerError } from '../../utils/custom.error';
+import { BadRequestError, InternalServerError } from '../../utils/custom.error';
 import { ApiResponse } from '../../utils/ApiResponse';
 import { StatusCodes } from 'http-status-codes';
 import tweetService from './tweet.service';
 
 class TweetController {
+  /**
+   * @desc    Get users tweets
+   * @route   GET /api/tweets/user/:userId
+   * @access  Private
+   */
+
+  async getUserTweets(req: Request<{ userId: string }>, res: Response) {
+    // Get user id from request
+    const { userId } = req.params;
+
+    // Find user tweets
+    const userTweets = await tweetService.getUserTweetsById(userId);
+
+    if (!userTweets) {
+      throw new BadRequestError('user not exits');
+    }
+
+    // Send response
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          'User tweets fetched successfully',
+          userTweets,
+        ),
+      );
+  }
+
   /**
    * @desc    Create a New Tweet
    * @route   POST /api/tweets/
@@ -81,7 +110,7 @@ class TweetController {
     // Get tweet id from request
     const { tweetId } = req.params;
 
-    // Update tweet
+    // Delete tweet
     const deletedTweet = await tweetService.deleteTweetById(tweetId);
 
     if (!deletedTweet) {
