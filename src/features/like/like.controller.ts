@@ -11,6 +11,22 @@ import tweetService from '../tweet/tweet.service';
 
 class LikeController {
   /**
+   * @desc    Get Liked Videos
+   * @route   POST /api/likes/videos
+   * @access  Private
+   */
+
+  async getLikedVideos(req: CustomRequest, res: Response) {
+    // Get liked videos
+    const likedVideos = await likeService.getLikedVideos(req.user?._id);
+
+    // Send response
+    res
+      .status(StatusCodes.OK)
+      .json(new ApiResponse(StatusCodes.OK, '', likedVideos));
+  }
+
+  /**
    * @desc    Toggle video like
    * @route   POST /api/likes/toggle/v/:videoId
    * @access  Private

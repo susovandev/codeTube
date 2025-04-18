@@ -16,8 +16,10 @@ tweetRouter
 tweetRouter
   .route('/user/:userId')
   .get(asyncWrapper(tweetController.getUserTweets));
+
 tweetRouter
   .route('/:tweetId')
   .patch(validate(updateTweetSchema), asyncWrapper(tweetController.updateTweet))
   .delete(asyncWrapper(tweetController.deleteTweet));
+
 export default tweetRouter;

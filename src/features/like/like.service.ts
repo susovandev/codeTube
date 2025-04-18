@@ -4,6 +4,17 @@ import Like from './like.model';
 import { ILike } from './like.interface';
 
 class LikeServices {
+  async getLikedVideos(userId: Types.ObjectId | string): Promise<ILike[]> {
+    return await Like.find({
+      likedBy: userId,
+      video: {
+        $exists: true,
+      },
+    }).populate({
+      path: 'video',
+      select: 'title thumbnail',
+    });
+  }
   async deleteUserLikeOnVideo(
     videoId: string,
     userId: Types.ObjectId | string,
