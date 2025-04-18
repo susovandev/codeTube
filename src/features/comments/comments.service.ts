@@ -8,6 +8,10 @@ class commentsService {
       select: 'username email avatar createdAt',
     });
   }
+
+  async getCommentById(commentId: string): Promise<IComments | null> {
+    return await Comments.findById(commentId);
+  }
   async createNewComment(
     requestBody: Partial<IComments>,
   ): Promise<IComments | null> {

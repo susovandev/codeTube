@@ -9,4 +9,6 @@ export interface ILike extends Document {
   comment: Types.ObjectId | IComments;
   tweet: Types.ObjectId | ITweet;
   likedBy: Types.ObjectId | IUser;
+  createdAt: Date;
+  updatedAt: Date;
 }
