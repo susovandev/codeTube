@@ -5,6 +5,10 @@ class TweetServices {
   async getUserTweetsById(userId: string) {
     return await Tweet.find({ owner: userId });
   }
+
+  async getTweetById(tweetId: string): Promise<ITweet | null> {
+    return await Tweet.findById(tweetId);
+  }
   async createNewTweet(requestData: Partial<ITweet>): Promise<ITweet | null> {
     return await Tweet.create(requestData);
   }

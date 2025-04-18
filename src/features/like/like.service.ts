@@ -2,7 +2,6 @@ import { Types } from 'mongoose';
 import { IVideo } from '../video/video.interfaces';
 import Like from './like.model';
 import { ILike } from './like.interface';
-import { IComments } from '../comments/comments.interface';
 
 class LikeServices {
   async deleteUserLikeOnVideo(
@@ -28,7 +27,7 @@ class LikeServices {
   async deleteUserLikeOnComment(
     commentId: string,
     userId: Types.ObjectId | string,
-  ): Promise<IComments | null> {
+  ): Promise<ILike | null> {
     return await Like.findOneAndDelete({
       comment: commentId,
       likedBy: userId,
@@ -41,6 +40,26 @@ class LikeServices {
   ): Promise<ILike | null> {
     return await Like.create({
       comment: commentId,
+      likedBy: userId,
+    });
+  }
+
+  async deleteUserLikeOnTweet(
+    tweetId: string,
+    userId: Types.ObjectId | string,
+  ): Promise<ILike | null> {
+    return await Like.findOneAndDelete({
+      tweet: tweetId,
+      likedBy: userId,
+    });
+  }
+
+  async createLikeOnTweet(
+    tweetId: string,
+    userId: Types.ObjectId | string,
+  ): Promise<ILike | null> {
+    return await Like.create({
+      tweet: tweetId,
       likedBy: userId,
     });
   }
