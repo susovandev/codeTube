@@ -11,6 +11,7 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import compression from 'compression';
 import mongoSanitize from 'express-mongo-sanitize';
+import morganMiddleware from './middleware/morgan.middleware';
 
 export class Server {
   app: express.Application;
@@ -38,6 +39,11 @@ export class Server {
     this.app.use(hpp());
     this.app.use(mongoSanitize());
     this.app.use(corsConfig);
+
+    // Development Middlewares
+    if (config.environment === 'development') {
+      this.app.use(morganMiddleware);
+    }
 
     // Performance Enhancements
     this.app.use(compression());
