@@ -6,6 +6,7 @@ import { ApiResponse } from '../../utils/ApiResponse';
 import videoServices from '../video/video.services';
 import commentsService from './comments.service';
 import mongoose from 'mongoose';
+
 class commentsController {
   /**
    * @desc    Add a comment
@@ -17,6 +18,7 @@ class commentsController {
     // Get video id from request
     const { videoId } = req.params;
 
+    // Check if video id is valid
     if (!mongoose.Types.ObjectId.isValid(videoId)) {
       throw new BadRequestError('Invalid video ID');
     }

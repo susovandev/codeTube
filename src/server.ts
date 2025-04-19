@@ -12,6 +12,7 @@ import hpp from 'hpp';
 import compression from 'compression';
 import mongoSanitize from 'express-mongo-sanitize';
 import morganMiddleware from './middleware/morgan.middleware';
+import Logger from './config/logger';
 
 export class Server {
   app: express.Application;
@@ -30,7 +31,7 @@ export class Server {
     try {
       await connectionDB();
     } catch (error) {
-      console.log(`Database connection error: ${error}`);
+      Logger.error(`Database connection error: ${error}`);
     }
   }
   private middlewares() {

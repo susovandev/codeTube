@@ -2,13 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { config } from '../config/config';
 import { CustomError } from '../utils/custom.error';
 import { StatusCodes } from 'http-status-codes';
+import Logger from '../config/logger';
 export const errorMiddleware = (
   err: CustomError | Error,
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  config.environment === 'development' && console.log(err);
+  config.environment === 'development' && Logger.error(err);
   if (err instanceof CustomError) {
     res.status(err.statusCode).json({
       status: false,

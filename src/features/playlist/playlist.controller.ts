@@ -9,6 +9,7 @@ import fs from 'fs';
 import { IPlaylist } from './playlist.interface';
 import videoServices from '../video/video.services';
 import { StatusCodes } from 'http-status-codes';
+import Logger from '../../config/logger';
 
 class PlaylistController {
   /**
@@ -202,7 +203,7 @@ class PlaylistController {
         );
       }
     } catch (error) {
-      console.error('Cloudinary Delete Error:', error);
+      Logger.error('Cloudinary Delete Error:', error);
       throw new InternalServerError('Error deleting image');
     }
 

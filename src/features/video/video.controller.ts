@@ -8,6 +8,7 @@ import fs from 'fs';
 import videoServices from './video.services';
 import { Video } from './video.model';
 import { IVideo } from './video.interfaces';
+import Logger from '../../config/logger';
 
 class VideoController {
   /**
@@ -153,7 +154,7 @@ class VideoController {
       if (thumbnailLocalFilePath && fs.existsSync(thumbnailLocalFilePath)) {
         fs.unlinkSync(thumbnailLocalFilePath);
       }
-      console.error('Video Upload Error:', error);
+      Logger.error('Video Upload Error:', error);
       throw new BadRequestError('Error uploading video');
     }
   }
@@ -292,7 +293,7 @@ class VideoController {
         fs.unlinkSync(thumbnailLocalFilePath.path);
       }
 
-      console.error('Video update error:', error);
+      Logger.error('Video update error:', error);
       throw new BadRequestError(
         'Something went wrong while updating the video.',
       );

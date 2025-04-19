@@ -2,6 +2,7 @@ import { UploadApiResponse } from 'cloudinary';
 import cloudinary from '../config/cloudinaryConfig';
 import { InternalServerError } from './custom.error';
 import fs from 'fs';
+import Logger from '../config/logger';
 
 class Cloudinary {
   async uploadImageOnCloud(
@@ -21,7 +22,7 @@ class Cloudinary {
       if (fs.existsSync(localFilePath)) {
         fs.unlinkSync(localFilePath);
       }
-      console.error('Cloudinary Upload Error:', error);
+      Logger.error('Cloudinary Upload Error:', error);
       throw new InternalServerError('Error uploading image');
     }
   }
@@ -30,7 +31,7 @@ class Cloudinary {
     try {
       await cloudinary.uploader.destroy(publicId);
     } catch (error) {
-      console.error('Cloudinary Delete Error:', error);
+      Logger.error('Cloudinary Delete Error:', error);
       throw new InternalServerError('Error deleting image');
     }
   }
@@ -49,7 +50,7 @@ class Cloudinary {
       if (fs.existsSync(localFilePath)) {
         fs.unlinkSync(localFilePath);
       }
-      console.error('Cloudinary Upload Error:', error);
+      Logger.error('Cloudinary Upload Error:', error);
       throw new InternalServerError('Error uploading video');
     }
   }

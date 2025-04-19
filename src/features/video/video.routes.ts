@@ -38,6 +38,6 @@ videoRouter
 
 videoRouter
   .route('/toggle/publish/:videoId')
-  .patch(videoControllers.togglePublishStatus);
+  .patch(asyncWrapper(videoControllers.togglePublishStatus));
 
 export default videoRouter;

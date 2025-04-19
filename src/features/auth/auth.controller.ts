@@ -17,6 +17,7 @@ import { config } from '../../config/config';
 import { User } from '../user/user.model';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
+import Logger from '../../config/logger';
 
 class AuthController {
   /**
@@ -82,10 +83,10 @@ class AuthController {
 
       // Generate access and refresh tokens
       const { accessToken, refreshToken } =
-        await generateAccessTokenAndRefreshToken(users._id);
+        await generateAccessTokenAndRefreshToken(users?._id);
 
       // Fetch user details without sensitive data
-      const newUser = await userServices.findUserById(users._id);
+      const newUser = await userServices.findUserById(users?._id);
       if (!newUser) {
         throw new InternalServerError('Error creating user');
       }
@@ -104,7 +105,7 @@ class AuthController {
           secure: true,
         })
         .json(
-          new ApiResponse<IUser | null>(
+          new ApiResponse(
             StatusCodes.CREATED,
             `Welcome ${users?.fullName}, Your account has been created successfully`,
             newUser,
@@ -146,10 +147,10 @@ class AuthController {
 
     // Generate new tokens
     const { accessToken, refreshToken } =
-      await generateAccessTokenAndRefreshToken(user._id);
+      await generateAccessTokenAndRefreshToken(user?._id);
 
     // Fetch sanitized user data
-    const sanitizedUser = await userServices.findUserById(user._id);
+    const sanitizedUser = await userServices.findUserById(user?._id);
 
     // Set secure HTTP-only cookies and send response
     res
@@ -165,7 +166,7 @@ class AuthController {
         secure: true,
       })
       .json(
-        new ApiResponse<IUser | null>(
+        new ApiResponse(
           StatusCodes.OK,
           `Welcome ${sanitizedUser?.fullName}`,
           sanitizedUser,
@@ -179,12 +180,12 @@ class AuthController {
    * @access Private
    */
   async logout(req: CustomRequest, res: Response) {
-    if (!req.user || !req.user._id) {
+    if (!req.user || !req.user?._id) {
       throw new UnAuthorizedException('User not found or not authenticated');
     }
 
     // Clear refresh token from database
-    await userServices.updateUser(req.user._id, { refreshToken: '' });
+    await userServices.updateUser(req.user?._id, { refreshToken: '' });
 
     // Clear authentication cookies and send response
     res
@@ -225,7 +226,7 @@ class AuthController {
       ) as JwtPayload;
 
       // Fetch user from database
-      const user = await User.findById(decodedToken._id);
+      const user = await User.findById(decodedToken?._id);
       if (!user) {
         throw new ForbiddenException(
           'Unauthorized access. User does not exist.',
@@ -241,7 +242,7 @@ class AuthController {
 
       // Generate new tokens
       const { accessToken, refreshToken } =
-        await generateAccessTokenAndRefreshToken(user._id);
+        await generateAccessTokenAndRefreshToken(user?._id);
 
       // Set secure cookies and send response
       res
@@ -267,7 +268,7 @@ class AuthController {
           ),
         );
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw new UnAuthorizedException(
         'Invalid or expired refresh token. Please login again.',
       );

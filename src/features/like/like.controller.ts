@@ -23,7 +23,7 @@ class LikeController {
     // Send response
     res
       .status(StatusCodes.OK)
-      .json(new ApiResponse(StatusCodes.OK, '', likedVideos));
+      .json(new ApiResponse(StatusCodes.OK, 'Liked videos', likedVideos));
   }
 
   /**
@@ -50,7 +50,7 @@ class LikeController {
       // Send response
       return res
         .status(StatusCodes.OK)
-        .json(new ApiResponse(StatusCodes.OK, 'Like deleted successfully'));
+        .json(new ApiResponse(StatusCodes.OK, 'Disliked video successfully'));
     }
 
     const video = await videoServices.getVideoById(videoId);

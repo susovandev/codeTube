@@ -7,6 +7,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { config } from '../config/config';
 import { User } from '../features/user/user.model';
 import { IUser } from '../features/user/user.interfaces';
+import Logger from '../config/logger';
 
 export interface CustomRequest extends Request {
   user: IUser;
@@ -37,7 +38,7 @@ export const authMiddleware = async (
     req.user = user;
     next();
   } catch (error) {
-    console.log(`error`, error);
+    Logger.error(`error`, error);
     throw new UnAuthorizedException('Unauthorized');
   }
 };
