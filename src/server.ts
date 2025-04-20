@@ -13,6 +13,7 @@ import compression from 'compression';
 import mongoSanitize from 'express-mongo-sanitize';
 import morganMiddleware from './middleware/morgan.middleware';
 import Logger from './config/logger';
+import { setupSwaggerDocs } from './docs/swagger';
 
 export class Server {
   app: express.Application;
@@ -22,6 +23,7 @@ export class Server {
   async start() {
     await this.databaseConnection();
     this.middlewares();
+    this.setupSwigger();
     this.setupRoutes();
     this.setupGlobalErrors();
     this.listen();
@@ -59,6 +61,10 @@ export class Server {
 
   private setupRoutes() {
     appRoutes(this.app);
+  }
+
+  private setupSwigger() {
+    setupSwaggerDocs(this.app);
   }
   private setupGlobalErrors() {
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {

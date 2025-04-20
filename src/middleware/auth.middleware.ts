@@ -30,7 +30,7 @@ export const authMiddleware = async (
       config.accessTokenSecret as string,
     ) as JwtPayload;
 
-    const user = await User.findById(decodedToken._id).lean();
+    const user = await User.findById(decodedToken?._id).lean();
 
     if (!user) {
       throw new ForbiddenException('User not found');

@@ -12,6 +12,18 @@ import { upload } from '../../middleware/multer.middleware';
 
 const userRouter = Router();
 
+/**
+ * @swagger
+ * /users/profile:
+ *   get:
+ *     summary: Get current user's profile
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successful profile fetch
+ */
 userRouter.get(
   '/profile',
   asyncWrapper(authMiddleware),

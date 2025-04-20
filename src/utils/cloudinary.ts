@@ -36,19 +36,19 @@ class Cloudinary {
     }
   }
 
-  async uploadVideoOnCloud(localFilePath: string): Promise<UploadApiResponse> {
+  async uploadVideoOnCloud(localVideoPath: string): Promise<UploadApiResponse> {
     try {
-      const data = await cloudinary.uploader.upload(localFilePath, {
+      const data = await cloudinary.uploader.upload(localVideoPath, {
         folder: 'videos',
         resource_type: 'video',
         transformation: [{ quality: 'auto:best' }],
         media_metadata: true,
       });
-      fs.unlinkSync(localFilePath);
+      fs.unlinkSync(localVideoPath);
       return data;
     } catch (error) {
-      if (fs.existsSync(localFilePath)) {
-        fs.unlinkSync(localFilePath);
+      if (fs.existsSync(localVideoPath)) {
+        fs.unlinkSync(localVideoPath);
       }
       Logger.error('Cloudinary Upload Error:', error);
       throw new InternalServerError('Error uploading video');
