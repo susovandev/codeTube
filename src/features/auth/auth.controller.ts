@@ -22,7 +22,7 @@ import Logger from '../../config/logger';
 class AuthController {
   /**
    * @desc Register a new user
-   * @route POST /api/auth/register
+   * @route POST /api/auth/signup
    * @access Public
    */
   async createUser(req: Request<{}, {}, IUser>, res: Response) {
@@ -125,7 +125,7 @@ class AuthController {
 
   /**
    * @desc Login a user
-   * @route POST /api/auth/login
+   * @route POST /api/auth/signin
    * @access Public
    */
   async loginUser(req: Request<{}, {}, ILoginCredentials>, res: Response) {
