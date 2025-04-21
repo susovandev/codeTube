@@ -67,49 +67,7 @@ const authRouter = Router();
  *                   type: string
  *                   example: Welcome Susovan Das, Your account has been created successfully
  *                 data:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: 680537f8603103fc80db7c8f
- *                     username:
- *                       type: string
- *                       example: susovan
- *                     email:
- *                       type: string
- *                       example: susovandas.dev@gmail.com
- *                     fullName:
- *                       type: string
- *                       example: Susovan Das
- *                     avatar:
- *                       type: object
- *                       properties:
- *                         public_id:
- *                           type: string
- *                           example: images/avatars/glkllforpbsbqb7zvhvl
- *                         secure_url:
- *                           type: string
- *                           example: https://res.cloudinary.com/demo/image/upload/v1/avatar.png
- *                     coverImage:
- *                       type: object
- *                       properties:
- *                         public_id:
- *                           type: string
- *                           example: images/coverImages/g81ohjo1qmqb7kno4jrq
- *                         secure_url:
- *                           type: string
- *                           example: https://res.cloudinary.com/demo/image/upload/v1/cover.png
- *                     watchHistory:
- *                       type: array
- *                       items: {}
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *                     __v:
- *                       type: integer
+ *                    $ref: '#/components/schemas/User'
  *                 success:
  *                   type: boolean
  *                   example: true
@@ -151,28 +109,35 @@ authRouter.post(
  * @swagger
  * /auth/signin:
  *   post:
- *     summary: Login user with email or username and password
+ *     summary: Login user with either email or username and password
  *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 example: susovandas.dev@gmail.com
- *               username:
- *                 type: string
- *                 example: susovan
- *               password:
- *                 type: string
- *                 format: password
- *                 example: yourSecurePassword123
+ *             oneOf:
+ *               - type: object
+ *                 required: [email, password]
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                     format: email
+ *                     example: susovandas.dev@gmail.com
+ *                   password:
+ *                     type: string
+ *                     format: password
+ *                     example: yourSecurePassword123
+ *               - type: object
+ *                 required: [username, password]
+ *                 properties:
+ *                   username:
+ *                     type: string
+ *                     example: susovan
+ *                   password:
+ *                     type: string
+ *                     format: password
+ *                     example: yourSecurePassword123
  *     responses:
  *       200:
  *         description: User logged in successfully, tokens set in cookies
@@ -193,45 +158,7 @@ authRouter.post(
  *                   type: string
  *                   example: Welcome Susovan Das
  *                 data:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: 680537f8603103fc80db7c8f
- *                     username:
- *                       type: string
- *                       example: susovan
- *                     email:
- *                       type: string
- *                       example: susovandas.dev@gmail.com
- *                     fullName:
- *                       type: string
- *                       example: Susovan Das
- *                     avatar:
- *                       type: object
- *                       properties:
- *                         public_id:
- *                           type: string
- *                         secure_url:
- *                           type: string
- *                     coverImage:
- *                       type: object
- *                       properties:
- *                         public_id:
- *                           type: string
- *                         secure_url:
- *                           type: string
- *                     watchHistory:
- *                       type: array
- *                       items: {}
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *                     __v:
- *                       type: integer
+ *                   $ref: '#/components/schemas/User'
  *                 success:
  *                   type: boolean
  *                   example: true

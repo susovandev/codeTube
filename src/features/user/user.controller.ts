@@ -73,13 +73,15 @@ class UserController {
         username: updatedUser?.username,
         email: updatedUser?.email,
         fullName: updatedUser?.fullName,
+        createdAt: updatedUser?.createdAt,
+        updatedAt: updatedUser?.updatedAt,
       }),
     );
   }
 
   /**
    * @desc    Update User Avatar
-   * @route   PUT /api/user/profile/avatar
+   * @route   PATCH /api/user/profile/update-avatar
    * @access  Private
    */
 
@@ -147,7 +149,7 @@ class UserController {
 
   /**
    * @desc    Update User Cover Image
-   * @route   PUT /api/user/profile/cover-image
+   * @route   PATCH /api/user/profile/update-cover-image
    * @access  Private
    */
 

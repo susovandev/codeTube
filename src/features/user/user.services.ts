@@ -10,9 +10,7 @@ class UserServices {
     email: string,
     username: string,
   ): Promise<IUser | null> {
-    return await User.findOne({
-      $or: [{ email }, { username }],
-    });
+    return await User.findOne({ $or: [{ email }, { username }] });
   }
 
   /**
