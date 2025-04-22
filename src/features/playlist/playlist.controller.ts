@@ -298,7 +298,7 @@ class PlaylistController {
 
   /**
    * @desc    Remove Video from User Playlists
-   * @route   PATCH /api/playlists/add/:videoId/:playlistId
+   * @route   PATCH /api/playlists/remove/:videoId/:playlistId
    * @access  Private
    */
 
