@@ -86,7 +86,7 @@ class VideoController {
    */
   async publishVideo(req: CustomRequest, res: Response) {
     // Extract video details from request
-    const { title, description, category, tags } = req.body;
+    const { title, description, category } = req.body;
 
     // Extract video and thumbnail from request
     const { video, thumbnail } = req.files as {
@@ -131,7 +131,6 @@ class VideoController {
         title,
         description,
         category,
-        tags,
         owner: req.user?._id,
         duration: videoData?.duration,
       });
@@ -228,7 +227,7 @@ class VideoController {
     req: Request<{ videoId: string }, {}, Partial<IVideo>>,
     res: Response,
   ) {
-    const { title, description, category, tags } = req.body;
+    const { title, description, category } = req.body;
     const { videoId } = req.params;
     const thumbnailLocalFilePath = req.file;
 
@@ -271,7 +270,6 @@ class VideoController {
       if (title) video.title = title;
       if (description) video.description = description;
       if (category) video.category = category;
-      if (tags) video.tags = tags;
 
       const updatedVideo = await video.save();
 

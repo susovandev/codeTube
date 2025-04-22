@@ -56,12 +56,6 @@ const videoSchema = new Schema<IVideo>(
       type: String,
       trim: true,
     },
-    tags: [
-      {
-        type: String,
-        trim: true,
-      },
-    ],
     isPublished: {
       type: Boolean,
       default: false,

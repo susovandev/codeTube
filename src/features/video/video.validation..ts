@@ -14,7 +14,4 @@ export const publishVideoSchema = Joi.object({
   category: Joi.string().required().messages({
     'string.empty': 'Category is required',
   }),
-  tags: Joi.array().items(Joi.string()).required().messages({
-    'array.empty': 'Tags are required',
-  }),
 });
